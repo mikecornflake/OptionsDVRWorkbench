@@ -1,0 +1,163 @@
+object frmMain: TfrmMain
+  Left = 392
+  Height = 671
+  Top = 224
+  Width = 1282
+  Caption = 'OptionsDVR Workbench'
+  ClientHeight = 671
+  ClientWidth = 1282
+  LCLVersion = '4.99.0.0'
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  object tbMain: TToolBar
+    Left = 0
+    Height = 26
+    Top = 0
+    Width = 1282
+    Caption = 'tbMain'
+    Images = ImageList1
+    List = True
+    ShowCaptions = True
+    TabOrder = 0
+    object btnConfigureFolders: TToolButton
+      Left = 1
+      Top = 2
+      Caption = 'Configure Folders'
+      ImageIndex = 0
+      OnClick = btnConfigureFoldersClick
+    end
+  end
+  object tvFolders: TTreeView
+    Left = 0
+    Height = 622
+    Top = 26
+    Width = 319
+    Align = alLeft
+    Anchors = []
+    Images = ImageList1
+    TabOrder = 1
+    OnDeletion = tvFoldersDeletion
+    OnSelectionChanged = tvFoldersSelectionChanged
+  end
+  object sbMain: TStatusBar
+    Left = 0
+    Height = 23
+    Top = 648
+    Width = 1282
+    Panels = <    
+      item
+        Width = 400
+      end    
+      item
+        Text = 'Video:'
+        Width = 150
+      end    
+      item
+        Text = 'Anomaly:'
+        Width = 150
+      end    
+      item
+        Text = 'Stills:'
+        Width = 150
+      end>
+    SimplePanel = False
+  end
+  object pcMain: TPageControl
+    Left = 324
+    Height = 622
+    Top = 26
+    Width = 958
+    ActivePage = tsVideo
+    Align = alClient
+    TabIndex = 0
+    TabOrder = 3
+    object tsVideo: TTabSheet
+      Caption = 'Video'
+      ClientHeight = 594
+      ClientWidth = 950
+      object lvFiles: TListView
+        Left = 0
+        Height = 594
+        Top = 0
+        Width = 950
+        Align = alClient
+        Anchors = [akTop, akLeft, akBottom]
+        Columns = <        
+          item
+            Caption = 'FileA'
+            Width = 160
+          end        
+          item
+            Caption = 'DateTime'
+            Width = 120
+          end        
+          item
+            Caption = 'Duration'
+            Width = 65
+          end        
+          item
+            Caption = 'Folder'
+            Width = 400
+          end>
+        HideSelection = False
+        RowSelect = True
+        TabOrder = 0
+        ViewStyle = vsReport
+      end
+    end
+    object tsAnomaly: TTabSheet
+      Caption = 'Anomaly'
+    end
+    object tsStills: TTabSheet
+      Caption = 'Stills'
+    end
+    object tsLog: TTabSheet
+      Caption = 'Log'
+      ClientHeight = 594
+      ClientWidth = 950
+      object memLog: TMemo
+        Left = 0
+        Height = 594
+        Top = 0
+        Width = 950
+        Align = alClient
+        Lines.Strings = (
+          'memLog'
+        )
+        ScrollBars = ssAutoBoth
+        TabOrder = 0
+        WordWrap = False
+      end
+    end
+  end
+  object Splitter1: TSplitter
+    Left = 319
+    Height = 622
+    Top = 26
+    Width = 5
+  end
+  object ImageList1: TImageList
+    Left = 48
+    Top = 24
+    Bitmap = {
+      4C7A0100000010000000100000000C0200000000000078DAC5D34B4F13611406
+      E0F905FE153188804A0BDAEACAB873A5A00B95D212545A34111343E8462B6841
+      04A50B5CB0D098B860018AE84A8D94D2FB156B136283363130B5D8CEB4BEBEDF
+      74C6A80B12E3C2499EA4F365CE9973990290F01F1D9E0C3F6D1B0F62BF775523
+      7E77DC0B85792E59FE34254424EBFD887444279E5FAB02C96F751905681A5941
+      EB9DC0CF9C86037A7EE64E18F1E22CC6B8D3A10ACE04CB982BD490DA06D2E5BA
+      4C055853742A9063D1A6BB4158A7228D46FC3B3E6F8B55E0203BD9340A7A122A
+      BAA30A3ADF6C918C536F65CCAD97B51ACCA3AF6D22FE20E35F15818B6915CE8C
+      0A57A6AA196053FD690596E9289A3DCBD8474D1E3FF6DEF2A3E576C0E8A3D0C6
+      F885AF403F63ED7E198E95221C81227AE928634F3CFBA4F591608D718A09624E
+      9C99893984C79B80C517D7DE6168BEB98C934B9FD19752D11357D0CD9ECE472B
+      384743D92A1EE5B6D1E25E5C68E72C6E244AB0CC24F1BEC69929F51D64C9C91E
+      0678E3E2A1537729A5606603187C994743DF74E7A18910EC4B1BE87D91C77319
+      70656BB8CCFC57E8EA872AAEFD6290AEE76A78C27A8FF922902469176780E3B3
+      298CA44B78F80518FAF81DC33A77FE77C33451003CC9125ADD8BF3F5EF290CB3
+      980177FB807BF06E01633B98E52CCFCEAF63CF055F97D89F7532248B1ADAC52C
+      B90B933700F34EC656D1311ED814B58B785E0DD4F897764BFAF5AFFFBF1FE2D9
+      C786
+    }
+  end
+end

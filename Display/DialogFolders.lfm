@@ -1,0 +1,8 @@
+object dlgFolders: TdlgFolders
+  Left = 531
+  Height = 278
+  Top = 142
+  Width = 320
+  Caption = 'Configure Folders'
+  LCLVersion = '4.99.0.0'
+end
