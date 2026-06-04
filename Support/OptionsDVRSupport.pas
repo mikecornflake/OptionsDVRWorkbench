@@ -36,11 +36,18 @@ Var
   Prop: TOptionsProperty;
   PropRelativePath: String;
   Item: TListItem;
+  dDuration: TDateTime;
+  dTotalDuration: TDateTime;
+  TotalSeconds: Int64;
+  Hours, Minutes, Seconds: Int64;
 Begin
+  Log('Populating listview');
+
   AListView.Items.BeginUpdate;
   SetBusy;
   Try
     AListView.Items.Clear;
+    dTotalDuration := 0;
 
     For i := 0 To AOptionsProperties.Count - 1 Do
     Begin
@@ -52,10 +59,13 @@ Begin
         SameText(Copy(PropRelativePath, 1, Length(ARelativePath) + 1),
         ARelativePath + PathDelim) Then
       Begin
+        dDuration := Abs(Prop.EndDate - Prop.StartDate);
+        dTotalDuration := dTotalDuration + dDuration;
         Item := AListView.Items.Add;
         Item.Caption := Prop.VideoFile0;
+        Item.SubItems.Add(Prop.VehicleFolder.VehicleName);
         Item.SubItems.Add(FormatDateTime('yyyy-mm-dd hh:nn:ss', Prop.StartDate));
-        Item.SubItems.Add(FormatDateTime('HH:nn:ss', Abs(Prop.EndDate-Prop.StartDate)));
+        Item.SubItems.Add(FormatDateTime('HH:nn:ss', dDuration));
         Item.SubItems.Add(Prop.Folder);
         Item.Data := Prop;
       End;
@@ -63,6 +73,15 @@ Begin
   Finally
     ClearBusy;
     AListView.Items.EndUpdate;
+
+    TotalSeconds := Round(dTotalDuration * 86400);
+
+    Hours := TotalSeconds Div 3600;
+    Minutes := (TotalSeconds Div 60) Mod 60;
+    Seconds := TotalSeconds Mod 60;
+
+    frmMain.sbMain.Panels[3].Text :=
+      Format('Loaded duration: %.3d:%.2d:%.2d', [Hours, Minutes, Seconds]);
   End;
 End;
 
@@ -171,6 +190,9 @@ Procedure PopulateOptionsDVRTreeView(ATreeView: TTreeView; AOptionsProperties: T
           Node := ATreeView.Items.AddChild(ParentNode, AParts[i])
         Else
           Node := ATreeView.Items.Add(nil, AParts[i]);
+
+        Node.ImageIndex := 0;
+        Node.SelectedIndex := 1;
 
         Node.Data := TFolderTreeNodeData.Create;
 

@@ -98,7 +98,7 @@ Begin
   If IsExcludedFolder(AFolder, AExclude) Then
     Exit;
 
-  Log('Scanning: ' + AFolder);
+  LogOncePerSecond('Scanning: ' + AFolder);
 
   ReadPropertiesIni(AFolder, AVehicleFolder, AOptionsProperties);
 
@@ -135,7 +135,7 @@ Begin
   Begin
     vf := AVehicleFolders[i];
 
-    Log('Scanning: Vehicle='+vf.VehicleName);
+    Log('Scanning: Vehicle=' + vf.VehicleName);
 
     ScanRoot :=
       IncludeTrailingPathDelimiter(vf.Folder) + 'Data' + PathDelim + vf.VesselCode;

@@ -1,8 +1,8 @@
-program OptionsDVRWorkbench;
+Program OptionsDVRWorkbench;
 
 {$mode objfpc}{$H+}
 
-uses
+Uses
   {$IFDEF UNIX}
   cthreads,
   {$ENDIF}
@@ -10,19 +10,19 @@ uses
   athreads,
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, FormMain
-  { you can add units after this };
+  Forms,
+  FormMain { you can add units after this };
 
-{$R *.res}
+  {$R *.res}
 
-begin
-  RequireDerivedFormResource:=True;
+Begin
+  RequireDerivedFormResource := True;
   Application.Scaled:=True;
-  {$PUSH}{$WARN 5044 OFF}
-  Application.MainFormOnTaskbar:=True;
+  {$PUSH}
+  {$WARN 5044 OFF}
+  Application.MainFormOnTaskbar := True;
   {$POP}
   Application.Initialize;
   Application.CreateForm(TfrmMain, frmMain);
   Application.Run;
-end.
-
+End.
