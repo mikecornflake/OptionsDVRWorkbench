@@ -67,6 +67,7 @@ Begin
         Item.SubItems.Add(FormatDateTime('yyyy-mm-dd hh:nn:ss', Prop.StartDate));
         Item.SubItems.Add(FormatDateTime('HH:nn:ss', dDuration));
         Item.SubItems.Add(Prop.Folder);
+        //Item.SubItems.Add(GetRelativeOptionsFolder(Prop));
         Item.Data := Prop;
       End;
     End;

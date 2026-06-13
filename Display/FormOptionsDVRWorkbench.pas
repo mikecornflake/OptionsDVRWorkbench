@@ -8,7 +8,7 @@ Interface
 Uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ExtCtrls,
   StdCtrls, Buttons, LCLType, IniFiles,
-  FormMain,
+  FormMain, FrameVideoPlayers, FrameVideoBase,
   VehicleFolders, OptionsProperties;
 
 Type
@@ -16,30 +16,32 @@ Type
   { TfrmOptionsDVRWorkbench }
 
   TfrmOptionsDVRWorkbench = Class(TfrmMain)
-    btnOpenVideoFolder: TBitBtn;
-    btnPlayFileA: TBitBtn;
-    btnPlayFileB: TBitBtn;
-    btnPlayFileC: TBitBtn;
-    btnPlayFileD: TBitBtn;
-    btnOpenAnomalyFolder: TBitBtn;
-    btnOpenStillsFolder: TBitBtn;
-    ImageList1: TImageList;
     lvFiles: TListView;
     memLog: TMemo;
-    pnlControl: TPanel;
-    pnlBottom: TPanel;
+    pnlVideo: TPanel;
     pcMain: TPageControl;
     Splitter1: TSplitter;
+    splVideo: TSplitter;
+    tbVideo: TToolBar;
+    btnOpenVideoFolder: TToolButton;
+    btnOpenAnomalyFolder: TToolButton;
+    btnOpenStillsFolder: TToolButton;
+    btnPlayFileA: TToolButton;
+    btnPlayInternal: TToolButton;
+    ToolButton2: TToolButton;
+    ToolButton5: TToolButton;
+    btnPlayFileB: TToolButton;
+    btnPlayFileC: TToolButton;
+    btnPlayFileD: TToolButton;
     tsLog: TTabSheet;
     tsVideo: TTabSheet;
-    tsAnomaly: TTabSheet;
-    tsStills: TTabSheet;
     tbMain: TToolBar;
     btnConfigureFolders: TToolButton;
     tvFolders: TTreeView;
     Procedure btnConfigureFoldersClick(Sender: TObject);
     Procedure btnOpenFolderClick(Sender: TObject);
     Procedure btnPlayFileClick(Sender: TObject);
+    procedure btnPlayInternalClick(Sender: TObject);
     Procedure FormCreate(Sender: TObject);
     Procedure FormDestroy(Sender: TObject);
     Procedure lvFilesSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
@@ -49,8 +51,15 @@ Type
     FVehicleFolders: TVehicleFolders;
     FOptionsProperties: TOptionsProperties;
     FLastLogTick: QWord;
+    fmeVideoPlayer: TFrameVideoPlayer;
+
     Procedure RefreshListViewControlPanel(AForceDisable: Boolean = False);
   Protected
+    // Stored in %appdata% - Recommended for persisting user UI preferences
+    Procedure LoadLocalSettings(oInifile: TIniFile); Override;
+    Procedure SaveLocalSettings(oInifile: TIniFile); Override;
+
+    // Stored in ini file with exe - what folders to load etc
     Procedure SaveGlobalSettings(oInifile: TIniFile); Override;
     Procedure LoadGlobalSettings(oIniFile: TIniFile); Override;
   Public
@@ -69,7 +78,7 @@ Implementation
 Uses
   DateUtils,
   DialogFolders, OptionsScanner, OptionsDVRSupport,
-  OSSupport;
+  OSSupport, FileSupport, FrameVideolibmpv;
 
 Procedure Log(Const ALog: String);
 Begin
@@ -85,7 +94,7 @@ End;
 
 { TfrmOptionsDVRWorkbench }
 
-Procedure TfrmOptionsDVRWorkbench.FormCreate(Sender: TObject);
+procedure TfrmOptionsDVRWorkbench.FormCreate(Sender: TObject);
 Begin
   FVehicleFolders := TVehicleFolders.Create(True);
   FOptionsProperties := TOptionsProperties.Create(True);
@@ -96,15 +105,27 @@ Begin
   memLog.Lines.Clear;
 
   RefreshListViewControlPanel;
+
+  fmeVideoPlayer := TFrameVideoPlayer.Create(Self);
+  fmeVideoPlayer.Parent := pnlVideo;
+  fmeVideoPlayer.Name := 'fmeVideoPlayer';
+  fmeVideoPlayer.Align := alClient;
+
+  // Change this line to swap playback engines.
+  fmeVideoPlayer.PlaybackClass := TfmeVideoLibmpv;
+
+  fmeVideoPlayer.Autoplay := True;
+  fmeVideoPlayer.ShowLabel := False;
 End;
 
-Procedure TfrmOptionsDVRWorkbench.FormDestroy(Sender: TObject);
+procedure TfrmOptionsDVRWorkbench.FormDestroy(Sender: TObject);
 Begin
+  FreeAndNil(fmeVideoPlayer);
   FreeAndNil(FOptionsProperties);
   FreeAndNil(FVehicleFolders);
 End;
 
-Procedure TfrmOptionsDVRWorkbench.btnConfigureFoldersClick(Sender: TObject);
+procedure TfrmOptionsDVRWorkbench.btnConfigureFoldersClick(Sender: TObject);
 Begin
   btnConfigureFolders.Enabled := False;
   RefreshListViewControlPanel(True);
@@ -134,17 +155,17 @@ Begin
   End;
 End;
 
-Procedure TfrmOptionsDVRWorkbench.btnOpenFolderClick(Sender: TObject);
+procedure TfrmOptionsDVRWorkbench.btnOpenFolderClick(Sender: TObject);
 Var
   sFolder, sFile: String;
 Begin
-  If Not (Sender Is TBitBtn) Then
+  If Not (Sender Is TToolButton) Then
     Exit;
 
-  If Not TBitBtn(Sender).Enabled Then
+  If Not TToolButton(Sender).Enabled Then
     Exit;
 
-  sFolder := TBitBtn(Sender).Hint;
+  sFolder := TToolButton(Sender).Hint;
   sFile := sFolder + PathDelim + btnPlayFileA.Hint;
 
   If (sFolder <> '') And DirectoryExists(sFolder) Then
@@ -154,17 +175,17 @@ Begin
       LaunchFile('explorer.exe', Format('"%s"', [sFolder]));
 End;
 
-Procedure TfrmOptionsDVRWorkbench.btnPlayFileClick(Sender: TObject);
+procedure TfrmOptionsDVRWorkbench.btnPlayFileClick(Sender: TObject);
 Var
   sFile: String;
 Begin
-  If Not (Sender Is TBitBtn) Then
+  If Not (Sender Is TToolButton) Then
     Exit;
 
-  If Not TBitBtn(Sender).Enabled Then
+  If Not TToolButton(Sender).Enabled Then
     Exit;
 
-  sFile := TBitBtn(Sender).Hint;
+  sFile := TToolButton(Sender).Hint;
 
   If Assigned(lvFiles.Selected) Then
     lvFiles.Selected.Focused := True;
@@ -176,8 +197,20 @@ Begin
     lvFiles.Selected.Focused := True;
 End;
 
-Procedure TfrmOptionsDVRWorkbench.lvFilesSelectItem(Sender: TObject; Item: TListItem;
-  Selected: Boolean);
+procedure TfrmOptionsDVRWorkbench.btnPlayInternalClick(Sender: TObject);
+begin
+  // Another sill hack
+  If Assigned(lvFiles.Selected) Then
+  Begin
+    if btnPlayFileA.Enabled Then
+    Begin
+      fmeVideoPlayer.Filename := btnPlayFileA.Hint;
+    end;
+  end;
+end;
+
+procedure TfrmOptionsDVRWorkbench.lvFilesSelectItem(Sender: TObject;
+  Item: TListItem; Selected: Boolean);
 Begin
   RefreshListViewControlPanel;
 
@@ -187,13 +220,14 @@ Begin
     Item.ImageIndex := -1;  // normal icon
 End;
 
-Procedure TfrmOptionsDVRWorkbench.tvFoldersDeletion(Sender: TObject; Node: TTreeNode);
+procedure TfrmOptionsDVRWorkbench.tvFoldersDeletion(Sender: TObject;
+  Node: TTreeNode);
 Begin
   TObject(Node.Data).Free;
   Node.Data := nil;
 End;
 
-Procedure TfrmOptionsDVRWorkbench.tvFoldersSelectionChanged(Sender: TObject);
+procedure TfrmOptionsDVRWorkbench.tvFoldersSelectionChanged(Sender: TObject);
 Var
   Data: TFolderTreeNodeData;
 Begin
@@ -214,12 +248,13 @@ Begin
   Caption := Format('%s: [%s]', [Application.Title, Data.RelativePath]);
 End;
 
-Procedure TfrmOptionsDVRWorkbench.LoadGlobalSettings(oIniFile: TIniFile);
+procedure TfrmOptionsDVRWorkbench.LoadGlobalSettings(oIniFile: TIniFile);
 Var
   i, j: Integer;
   oVehicle: TVehicleFolder;
   sIniSection: String;
 Begin
+  // Stored in ini file with exe - what folders to load etc
   Inherited;
 
   FVehicleFolders.Clear;
@@ -230,7 +265,7 @@ Begin
 
     oVehicle := TVehicleFolder.Create;
 
-    oVehicle.Folder := oIniFile.ReadString(sIniSection, 'Folder', '');
+    oVehicle.Folder := ExpandFolder(oIniFile.ReadString(sIniSection, 'Folder', ''));
     oVehicle.VesselCode := oIniFile.ReadString(sIniSection, 'VesselCode', '');
     oVehicle.VesselName := oIniFile.ReadString(sIniSection, 'VesselName', '');
     oVehicle.VehicleName := oIniFile.ReadString(sIniSection, 'VehicleName', '');
@@ -245,12 +280,13 @@ Begin
   End;
 End;
 
-Procedure TfrmOptionsDVRWorkbench.SaveGlobalSettings(oInifile: TIniFile);
+procedure TfrmOptionsDVRWorkbench.SaveGlobalSettings(oInifile: TIniFile);
 Var
   i, j: Integer;
   oVehicle: TVehicleFolder;
   sIniSection: String;
 Begin
+  // Stored in ini file with exe - what folders to load etc
   Inherited;
 
   For i := 0 To FVehicleFolders.Count - 1 Do
@@ -263,7 +299,7 @@ Begin
     oVehicle := FVehicleFolders[i];
     sIniSection := Format('Vehicle%d', [i]);
 
-    oInifile.WriteString(sIniSection, 'Folder', oVehicle.Folder);
+    oInifile.WriteString(sIniSection, 'Folder', ShrinkFolder(oVehicle.Folder));
     oInifile.WriteString(sIniSection, 'VesselCode', oVehicle.VesselCode);
     oInifile.WriteString(sIniSection, 'VesselName', oVehicle.VesselName);
     oInifile.WriteString(sIniSection, 'VehicleName', oVehicle.VehicleName);
@@ -278,7 +314,8 @@ Begin
   End;
 End;
 
-Procedure TfrmOptionsDVRWorkbench.RefreshListViewControlPanel(AForceDisable: Boolean);
+procedure TfrmOptionsDVRWorkbench.RefreshListViewControlPanel(
+  AForceDisable: Boolean);
 Var
   sVideoFolder, sFileA, sAnomalyFolder, sStillsFolder, sFileB, sFileC, sFileD: String;
   oItem: TListItem;
@@ -291,6 +328,7 @@ Begin
   btnPlayFileB.Enabled := False;
   btnPlayFileC.Enabled := False;
   btnPlayFileD.Enabled := False;
+  btnPlayInternal.Enabled := False;
 
   If AForceDisable Then
     Exit;
@@ -339,6 +377,7 @@ Begin
 
   btnPlayFileA.Hint := sFileA;
   btnPlayFileA.Enabled := FileExists(sFileA);
+  btnPlayInternal.Enabled := btnPlayFileA.Enabled;
 
   btnPlayFileB.Hint := sFileB;
   btnPlayFileB.Enabled := FileExists(sFileB);
@@ -350,7 +389,19 @@ Begin
   btnPlayFileD.Enabled := FileExists(sFileD);
 End;
 
-Procedure TfrmOptionsDVRWorkbench.Log(Const ALog: String);
+procedure TfrmOptionsDVRWorkbench.LoadLocalSettings(oInifile: TIniFile);
+begin
+  // Stored in %appdata% - Recommended for persisting user UI preferences
+  inherited LoadLocalSettings(oInifile);
+end;
+
+procedure TfrmOptionsDVRWorkbench.SaveLocalSettings(oInifile: TIniFile);
+begin
+  // Stored in %appdata% - Recommended for persisting user UI preferences
+  inherited SaveLocalSettings(oInifile);
+end;
+
+procedure TfrmOptionsDVRWorkbench.Log(const ALog: String);
 Begin
   If ALog <> '' Then
     memLog.Lines.Add(FormatDateTime('HH:nn:ss.zzz', Now) + ': ' + ALog);
@@ -358,7 +409,7 @@ Begin
   sbMain.Panels[0].Text := ALog;
 End;
 
-Procedure TfrmOptionsDVRWorkbench.LogOncePerSecond(Const ALog: String);
+procedure TfrmOptionsDVRWorkbench.LogOncePerSecond(const ALog: String);
 Var
   Tick: QWord;
 Begin
