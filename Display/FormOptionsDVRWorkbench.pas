@@ -1,4 +1,4 @@
-Unit FormMain;
+Unit FormOptionsDVRWorkbench;
 
 {$mode objfpc}{$H+}
 {$WARN 6058 off : Call to subroutine "$1" marked as inline is not inlined}
@@ -7,13 +7,15 @@ Interface
 
 Uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ExtCtrls,
-  StdCtrls, Buttons, LCLType, VehicleFolders, OptionsProperties;
+  StdCtrls, Buttons, LCLType, IniFiles,
+  FormMain,
+  VehicleFolders, OptionsProperties;
 
 Type
 
-  { TfrmMain }
+  { TfrmOptionsDVRWorkbench }
 
-  TfrmMain = Class(TForm)
+  TfrmOptionsDVRWorkbench = Class(TfrmMain)
     btnOpenVideoFolder: TBitBtn;
     btnPlayFileA: TBitBtn;
     btnPlayFileB: TBitBtn;
@@ -27,7 +29,6 @@ Type
     pnlControl: TPanel;
     pnlBottom: TPanel;
     pcMain: TPageControl;
-    sbMain: TStatusBar;
     Splitter1: TSplitter;
     tsLog: TTabSheet;
     tsVideo: TTabSheet;
@@ -48,17 +49,17 @@ Type
     FVehicleFolders: TVehicleFolders;
     FOptionsProperties: TOptionsProperties;
     FLastLogTick: QWord;
-    Procedure LoadOptions;
-    Procedure SaveOptions;
-
     Procedure RefreshListViewControlPanel(AForceDisable: Boolean = False);
+  Protected
+    Procedure SaveGlobalSettings(oInifile: TIniFile); Override;
+    Procedure LoadGlobalSettings(oIniFile: TIniFile); Override;
   Public
     Procedure Log(Const ALog: String);
     Procedure LogOncePerSecond(Const ALog: String);
   End;
 
 Var
-  frmMain: TfrmMain;
+  frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench;
 
 Procedure Log(Const ALog: String);
 Procedure LogOncePerSecond(Const ALog: String);
@@ -66,31 +67,29 @@ Procedure LogOncePerSecond(Const ALog: String);
 Implementation
 
 Uses
-  IniFiles, DateUtils,
+  DateUtils,
   DialogFolders, OptionsScanner, OptionsDVRSupport,
   OSSupport;
 
 Procedure Log(Const ALog: String);
 Begin
-  frmMain.Log(ALog);
+  frmOptionsDVRWorkbench.Log(ALog);
 End;
 
 Procedure LogOncePerSecond(Const ALog: String);
 Begin
-  frmMain.LogOncePerSecond(ALog);
+  frmOptionsDVRWorkbench.LogOncePerSecond(ALog);
 End;
 
 {$R *.lfm}
 
-{ TfrmMain }
+{ TfrmOptionsDVRWorkbench }
 
-Procedure TfrmMain.FormCreate(Sender: TObject);
+Procedure TfrmOptionsDVRWorkbench.FormCreate(Sender: TObject);
 Begin
   FVehicleFolders := TVehicleFolders.Create(True);
   FOptionsProperties := TOptionsProperties.Create(True);
   FLastLogTick := 0;
-
-  LoadOptions;
 
   pcMain.ActivePage := tsVideo;
 
@@ -99,11 +98,17 @@ Begin
   RefreshListViewControlPanel;
 End;
 
-Procedure TfrmMain.btnConfigureFoldersClick(Sender: TObject);
+Procedure TfrmOptionsDVRWorkbench.FormDestroy(Sender: TObject);
+Begin
+  FreeAndNil(FOptionsProperties);
+  FreeAndNil(FVehicleFolders);
+End;
+
+Procedure TfrmOptionsDVRWorkbench.btnConfigureFoldersClick(Sender: TObject);
 Begin
   btnConfigureFolders.Enabled := False;
   RefreshListViewControlPanel(True);
-  SetBusy;
+  Busy := True;
   Try
     pcMain.ActivePage := tsLog;
 
@@ -125,11 +130,11 @@ Begin
   Finally
     pcMain.ActivePage := tsVideo;
     btnConfigureFolders.Enabled := True;
-    ClearBusy;
+    Busy := False;
   End;
 End;
 
-Procedure TfrmMain.btnOpenFolderClick(Sender: TObject);
+Procedure TfrmOptionsDVRWorkbench.btnOpenFolderClick(Sender: TObject);
 Var
   sFolder, sFile: String;
 Begin
@@ -149,7 +154,7 @@ Begin
       LaunchFile('explorer.exe', Format('"%s"', [sFolder]));
 End;
 
-Procedure TfrmMain.btnPlayFileClick(Sender: TObject);
+Procedure TfrmOptionsDVRWorkbench.btnPlayFileClick(Sender: TObject);
 Var
   sFile: String;
 Begin
@@ -171,15 +176,8 @@ Begin
     lvFiles.Selected.Focused := True;
 End;
 
-Procedure TfrmMain.FormDestroy(Sender: TObject);
-Begin
-  SaveOptions;
-
-  FreeAndNil(FOptionsProperties);
-  FreeAndNil(FVehicleFolders);
-End;
-
-Procedure TfrmMain.lvFilesSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
+Procedure TfrmOptionsDVRWorkbench.lvFilesSelectItem(Sender: TObject; Item: TListItem;
+  Selected: Boolean);
 Begin
   RefreshListViewControlPanel;
 
@@ -189,13 +187,13 @@ Begin
     Item.ImageIndex := -1;  // normal icon
 End;
 
-Procedure TfrmMain.tvFoldersDeletion(Sender: TObject; Node: TTreeNode);
+Procedure TfrmOptionsDVRWorkbench.tvFoldersDeletion(Sender: TObject; Node: TTreeNode);
 Begin
   TObject(Node.Data).Free;
   Node.Data := nil;
 End;
 
-Procedure TfrmMain.tvFoldersSelectionChanged(Sender: TObject);
+Procedure TfrmOptionsDVRWorkbench.tvFoldersSelectionChanged(Sender: TObject);
 Var
   Data: TFolderTreeNodeData;
 Begin
@@ -216,93 +214,71 @@ Begin
   Caption := Format('%s: [%s]', [Application.Title, Data.RelativePath]);
 End;
 
-Procedure TfrmMain.LoadOptions;
+Procedure TfrmOptionsDVRWorkbench.LoadGlobalSettings(oIniFile: TIniFile);
 Var
-  ini: TIniFile;
-  sIniFile: String;
   i, j: Integer;
-  Vehicle: TVehicleFolder;
-  Section: String;
+  oVehicle: TVehicleFolder;
+  sIniSection: String;
 Begin
+  Inherited;
+
   FVehicleFolders.Clear;
 
-  sIniFile := ChangeFileExt(Application.ExeName, '.ini');
+  For i := 0 To oIniFile.ReadInteger('General', 'VehicleCount', 0) - 1 Do
+  Begin
+    sIniSection := Format('Vehicle%d', [i]);
 
-  If Not FileExists(sIniFile) Then
-    Exit;
+    oVehicle := TVehicleFolder.Create;
 
-  ini := TIniFile.Create(sIniFile);
-  Try
-    For i := 0 To ini.ReadInteger('General', 'VehicleCount', 0) - 1 Do
-    Begin
-      Section := Format('Vehicle%d', [i]);
+    oVehicle.Folder := oIniFile.ReadString(sIniSection, 'Folder', '');
+    oVehicle.VesselCode := oIniFile.ReadString(sIniSection, 'VesselCode', '');
+    oVehicle.VesselName := oIniFile.ReadString(sIniSection, 'VesselName', '');
+    oVehicle.VehicleName := oIniFile.ReadString(sIniSection, 'VehicleName', '');
+    oVehicle.VehicleClass := oIniFile.ReadString(sIniSection, 'VehicleClass', '');
 
-      Vehicle := TVehicleFolder.Create;
+    oVehicle.Exclude.Clear;
 
-      Vehicle.Folder := ini.ReadString(Section, 'Folder', '');
-      Vehicle.VesselCode := ini.ReadString(Section, 'VesselCode', '');
-      Vehicle.VesselName := ini.ReadString(Section, 'VesselName', '');
-      Vehicle.VehicleName := ini.ReadString(Section, 'VehicleName', '');
-      Vehicle.VehicleClass := ini.ReadString(Section, 'VehicleClass', '');
+    For j := 0 To oIniFile.ReadInteger(sIniSection, 'ExcludeCount', 0) - 1 Do
+      oVehicle.Exclude.Add(oIniFile.ReadString(sIniSection, Format('Exclude%d', [j]), ''));
 
-      Vehicle.Exclude.Clear;
-
-      For j := 0 To ini.ReadInteger(Section, 'ExcludeCount', 0) - 1 Do
-        Vehicle.Exclude.Add(ini.ReadString(Section, Format('Exclude%d', [j]), ''));
-
-      FVehicleFolders.Add(Vehicle);
-    End;
-  Finally
-    ini.Free;
+    FVehicleFolders.Add(oVehicle);
   End;
 End;
 
-Procedure TfrmMain.SaveOptions;
+Procedure TfrmOptionsDVRWorkbench.SaveGlobalSettings(oInifile: TIniFile);
 Var
-  ini: TIniFile;
-  sIniFile: String;
   i, j: Integer;
-  Vehicle: TVehicleFolder;
-  Section: String;
+  oVehicle: TVehicleFolder;
+  sIniSection: String;
 Begin
-  sIniFile := ChangeFileExt(Application.ExeName, '.ini');
+  Inherited;
 
-  ini := TIniFile.Create(sIniFile);
-  Try
-    ini.EraseSection('General');
+  For i := 0 To FVehicleFolders.Count - 1 Do
+    oInifile.EraseSection(Format('oVehicle%d', [i]));
 
-    For i := 0 To FVehicleFolders.Count - 1 Do
-      ini.EraseSection(Format('Vehicle%d', [i]));
+  oInifile.WriteInteger('General', 'VehicleCount', FVehicleFolders.Count);
 
-    ini.WriteInteger('General', 'VehicleCount', FVehicleFolders.Count);
+  For i := 0 To FVehicleFolders.Count - 1 Do
+  Begin
+    oVehicle := FVehicleFolders[i];
+    sIniSection := Format('Vehicle%d', [i]);
 
-    For i := 0 To FVehicleFolders.Count - 1 Do
-    Begin
-      Vehicle := FVehicleFolders[i];
-      Section := Format('Vehicle%d', [i]);
+    oInifile.WriteString(sIniSection, 'Folder', oVehicle.Folder);
+    oInifile.WriteString(sIniSection, 'VesselCode', oVehicle.VesselCode);
+    oInifile.WriteString(sIniSection, 'VesselName', oVehicle.VesselName);
+    oInifile.WriteString(sIniSection, 'VehicleName', oVehicle.VehicleName);
+    oInifile.WriteString(sIniSection, 'VehicleClass', oVehicle.VehicleClass);
 
-      ini.WriteString(Section, 'Folder', Vehicle.Folder);
-      ini.WriteString(Section, 'VesselCode', Vehicle.VesselCode);
-      ini.WriteString(Section, 'VesselName', Vehicle.VesselName);
-      ini.WriteString(Section, 'VehicleName', Vehicle.VehicleName);
-      ini.WriteString(Section, 'VehicleClass', Vehicle.VehicleClass);
+    // Write the exclude TStringList
+    oInifile.WriteInteger(sIniSection, 'ExcludeCount',
+      oVehicle.Exclude.Count);
 
-      ini.WriteInteger(Section, 'ExcludeCount',
-        Vehicle.Exclude.Count);
-
-      For j := 0 To Vehicle.Exclude.Count - 1 Do
-        ini.WriteString(Section,
-          Format('Exclude%d', [j]),
-          Vehicle.Exclude[j]);
-    End;
-
-    ini.UpdateFile;
-  Finally
-    ini.Free;
+    For j := 0 To oVehicle.Exclude.Count - 1 Do
+      oInifile.WriteString(sIniSection,Format('Exclude%d', [j]),oVehicle.Exclude[j]);
   End;
 End;
 
-Procedure TfrmMain.RefreshListViewControlPanel(AForceDisable: Boolean);
+Procedure TfrmOptionsDVRWorkbench.RefreshListViewControlPanel(AForceDisable: Boolean);
 Var
   sVideoFolder, sFileA, sAnomalyFolder, sStillsFolder, sFileB, sFileC, sFileD: String;
   oItem: TListItem;
@@ -374,7 +350,7 @@ Begin
   btnPlayFileD.Enabled := FileExists(sFileD);
 End;
 
-Procedure TfrmMain.Log(Const ALog: String);
+Procedure TfrmOptionsDVRWorkbench.Log(Const ALog: String);
 Begin
   If ALog <> '' Then
     memLog.Lines.Add(FormatDateTime('HH:nn:ss.zzz', Now) + ': ' + ALog);
@@ -382,7 +358,7 @@ Begin
   sbMain.Panels[0].Text := ALog;
 End;
 
-Procedure TfrmMain.LogOncePerSecond(Const ALog: String);
+Procedure TfrmOptionsDVRWorkbench.LogOncePerSecond(Const ALog: String);
 Var
   Tick: QWord;
 Begin

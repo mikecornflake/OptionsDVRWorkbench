@@ -13,7 +13,7 @@ Procedure ScanVehicleFolders(AVehicleFolders: TVehicleFolders;
 
 Implementation
 
-Uses DateUtils, FormMain;
+Uses DateUtils, FormOptionsDVRWorkbench;
 
 Function IsExcludedFolder(Const AFolder: String; AExclude: TStringList): Boolean;
 Var

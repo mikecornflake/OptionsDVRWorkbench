@@ -1,4 +1,4 @@
-object frmMain: TfrmMain
+inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
   Left = 397
   Height = 671
   Top = 140
@@ -6,46 +6,14 @@ object frmMain: TfrmMain
   Caption = 'OptionsDVR Workbench'
   ClientHeight = 671
   ClientWidth = 1282
-  LCLVersion = '4.99.0.0'
   OnCreate = FormCreate
   OnDestroy = FormDestroy
-  object tbMain: TToolBar
-    Left = 0
-    Height = 26
-    Top = 0
+  inherited pbMain: TProgressBar
+    Top = 625
     Width = 1282
-    Caption = 'tbMain'
-    Images = ImageList1
-    List = True
-    ShowCaptions = True
-    TabOrder = 0
-    object btnConfigureFolders: TToolButton
-      Left = 1
-      Top = 2
-      Caption = 'Configure Folders'
-      ImageIndex = 0
-      OnClick = btnConfigureFoldersClick
-    end
+    TabOrder = 3
   end
-  object tvFolders: TTreeView
-    Left = 0
-    Height = 622
-    Top = 26
-    Width = 319
-    Align = alLeft
-    Anchors = []
-    HideSelection = False
-    Images = ImageList1
-    ReadOnly = True
-    RowSelect = True
-    TabOrder = 1
-    Options = [tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoReadOnly, tvoRowSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
-    OnDeletion = tvFoldersDeletion
-    OnSelectionChanged = tvFoldersSelectionChanged
-  end
-  object sbMain: TStatusBar
-    Left = 0
-    Height = 23
+  inherited sbMain: TStatusBar
     Top = 648
     Width = 1282
     Panels = <    
@@ -66,22 +34,56 @@ object frmMain: TfrmMain
       end>
     SimplePanel = False
   end
-  object pcMain: TPageControl
+  object tbMain: TToolBar[2]
+    Left = 0
+    Height = 26
+    Top = 0
+    Width = 1282
+    Caption = 'tbMain'
+    Images = ImageList1
+    List = True
+    ShowCaptions = True
+    TabOrder = 0
+    object btnConfigureFolders: TToolButton
+      Left = 1
+      Top = 2
+      Caption = 'Configure Folders'
+      ImageIndex = 0
+      OnClick = btnConfigureFoldersClick
+    end
+  end
+  object tvFolders: TTreeView[3]
+    Left = 0
+    Height = 599
+    Top = 26
+    Width = 319
+    Align = alLeft
+    Anchors = []
+    HideSelection = False
+    Images = ImageList1
+    ReadOnly = True
+    RowSelect = True
+    TabOrder = 1
+    Options = [tvoAutoItemHeight, tvoKeepCollapsedNodes, tvoReadOnly, tvoRowSelect, tvoShowButtons, tvoShowLines, tvoShowRoot, tvoToolTips, tvoThemedDraw]
+    OnDeletion = tvFoldersDeletion
+    OnSelectionChanged = tvFoldersSelectionChanged
+  end
+  object pcMain: TPageControl[4]
     Left = 324
-    Height = 622
+    Height = 599
     Top = 26
     Width = 958
     ActivePage = tsVideo
     Align = alClient
     TabIndex = 0
-    TabOrder = 3
+    TabOrder = 2
     object tsVideo: TTabSheet
       Caption = 'Video'
-      ClientHeight = 594
+      ClientHeight = 571
       ClientWidth = 950
       object lvFiles: TListView
         Left = 0
-        Height = 424
+        Height = 401
         Top = 0
         Width = 780
         Align = alClient
@@ -120,12 +122,12 @@ object frmMain: TfrmMain
       end
       object pnlControl: TPanel
         Left = 780
-        Height = 424
+        Height = 401
         Top = 0
         Width = 170
         Align = alRight
         BevelOuter = bvNone
-        ClientHeight = 424
+        ClientHeight = 401
         ClientWidth = 170
         TabOrder = 1
         object btnOpenVideoFolder: TBitBtn
@@ -216,7 +218,7 @@ object frmMain: TfrmMain
       object pnlBottom: TPanel
         Left = 0
         Height = 170
-        Top = 424
+        Top = 401
         Width = 950
         Align = alBottom
         BevelOuter = bvNone
@@ -231,11 +233,11 @@ object frmMain: TfrmMain
     end
     object tsLog: TTabSheet
       Caption = 'Log'
-      ClientHeight = 594
+      ClientHeight = 571
       ClientWidth = 950
       object memLog: TMemo
         Left = 0
-        Height = 594
+        Height = 571
         Top = 0
         Width = 950
         Align = alClient
@@ -248,13 +250,17 @@ object frmMain: TfrmMain
       end
     end
   end
-  object Splitter1: TSplitter
+  object Splitter1: TSplitter[5]
     Left = 319
-    Height = 622
+    Height = 599
     Top = 26
     Width = 5
   end
-  object ImageList1: TImageList
+  inherited ilImages: TImageList[6]
+  end
+  inherited mnuMain: TMainMenu[7]
+  end
+  object ImageList1: TImageList[8]
     Left = 48
     Top = 24
     Bitmap = {

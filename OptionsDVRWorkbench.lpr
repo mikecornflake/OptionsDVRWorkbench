@@ -11,7 +11,7 @@ Uses
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms,
-  FormMain { you can add units after this };
+  FormOptionsDVRWorkbench { you can add units after this };
 
   {$R *.res}
 
@@ -23,6 +23,6 @@ Begin
   Application.MainFormOnTaskbar := True;
   {$POP}
   Application.Initialize;
-  Application.CreateForm(TfrmMain, frmMain);
+  Application.CreateForm(TfrmOptionsDVRWorkbench, frmOptionsDVRWorkbench);
   Application.Run;
 End.

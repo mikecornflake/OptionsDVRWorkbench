@@ -27,7 +27,7 @@ Procedure SortOptionsPropertiesByStartDate(AOptionsProperties: TOptionsPropertie
 Implementation
 
 Uses
-  VehicleFolders, StringSupport, OSSupport, FormMain;
+  VehicleFolders, StringSupport, OSSupport, FormOptionsDVRWorkbench;
 
 Procedure PopulateFilesListForFolder(AListView: TListView; AOptionsProperties: TOptionsProperties;
   Const ARelativePath: String);
@@ -80,7 +80,7 @@ Begin
     Minutes := (TotalSeconds Div 60) Mod 60;
     Seconds := TotalSeconds Mod 60;
 
-    frmMain.sbMain.Panels[3].Text :=
+    frmOptionsDVRWorkbench.sbMain.Panels[3].Text :=
       Format('Loaded duration: %.3d:%.2d:%.2d', [Hours, Minutes, Seconds]);
   End;
 End;
