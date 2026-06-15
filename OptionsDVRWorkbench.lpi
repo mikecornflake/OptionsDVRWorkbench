@@ -81,7 +81,7 @@
     <Version Value="11"/>
     <PathDelim Value="\"/>
     <Target>
-      <Filename Value="$(TestDir)\OptionsDVRWorkbench"/>
+      <Filename Value="$(TestDir)\$NameOnly($(ProjFile))\$NameOnly($(ProjFile))"/>
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
