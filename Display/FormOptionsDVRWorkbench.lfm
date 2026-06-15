@@ -9,12 +9,12 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   inherited pbMain: TProgressBar
-    Top = 847
+    Top = 871
     Width = 1282
     TabOrder = 3
   end
   inherited sbMain: TStatusBar
-    Top = 881
+    Top = 894
     Width = 1282
     Panels = <    
       item
@@ -54,7 +54,7 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
   end
   object tvFolders: TTreeView[3]
     Left = 0
-    Height = 821
+    Height = 845
     Top = 26
     Width = 319
     Align = alLeft
@@ -69,7 +69,7 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
   end
   object pcMain: TPageControl[4]
     Left = 324
-    Height = 821
+    Height = 845
     Top = 26
     Width = 958
     ActivePage = tsVideo
@@ -78,11 +78,11 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
     TabOrder = 2
     object tsVideo: TTabSheet
       Caption = 'Video'
-      ClientHeight = 783
+      ClientHeight = 817
       ClientWidth = 950
       object lvFiles: TListView
         Left = 0
-        Height = 368
+        Height = 402
         Top = 26
         Width = 950
         Align = alClient
@@ -108,7 +108,7 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
           item
             AutoSize = True
             Caption = 'Folder'
-            Width = 75
+            Width = 48
           end>
         HideSelection = False
         ReadOnly = True
@@ -121,7 +121,7 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
       object pnlVideo: TPanel
         Left = 0
         Height = 384
-        Top = 399
+        Top = 433
         Width = 950
         Align = alBottom
         BevelOuter = bvNone
@@ -148,7 +148,7 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
           OnClick = btnOpenFolderClick
         end
         object btnOpenAnomalyFolder: TToolButton
-          Left = 81
+          Left = 60
           Hint = 'Open Anomaly Folder'
           Top = 2
           Caption = 'Anomaly'
@@ -158,7 +158,7 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
           OnClick = btnOpenFolderClick
         end
         object btnOpenStillsFolder: TToolButton
-          Left = 186
+          Left = 137
           Hint = 'Open Stills Folder'
           Top = 2
           Caption = 'Stills'
@@ -168,7 +168,7 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
           OnClick = btnOpenFolderClick
         end
         object btnPlayFileA: TToolButton
-          Left = 264
+          Left = 198
           Hint = 'Play Video A'
           Top = 2
           Caption = 'Video A'
@@ -178,14 +178,14 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
           OnClick = btnPlayFileClick
         end
         object ToolButton5: TToolButton
-          Left = 256
-          Height = 33
+          Left = 190
+          Height = 22
           Top = 2
           Caption = 'ToolButton5'
           Style = tbsSeparator
         end
         object btnPlayFileB: TToolButton
-          Left = 361
+          Left = 268
           Hint = 'Play Video B'
           Top = 2
           Caption = 'Video B'
@@ -195,7 +195,7 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
           OnClick = btnPlayFileClick
         end
         object btnPlayFileC: TToolButton
-          Left = 456
+          Left = 337
           Hint = 'Play Video C'
           Top = 2
           Caption = 'Video C'
@@ -205,7 +205,7 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
           OnClick = btnPlayFileClick
         end
         object btnPlayFileD: TToolButton
-          Left = 552
+          Left = 407
           Hint = 'Play Video D'
           Top = 2
           Caption = 'Video D'
@@ -215,21 +215,21 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
           OnClick = btnPlayFileClick
         end
         object btnPlayInternal: TToolButton
-          Left = 658
+          Left = 485
           Top = 2
           Caption = 'All Files'
           ImageIndex = 6
           OnClick = btnPlayInternalClick
         end
         object ToolButton2: TToolButton
-          Left = 650
-          Height = 33
+          Left = 477
+          Height = 22
           Top = 2
           Caption = 'ToolButton2'
           Style = tbsSeparator
         end
         object btnAutoload: TToolButton
-          Left = 751
+          Left = 554
           Top = 2
           Caption = 'Auto Load'
           ImageIndex = 6
@@ -240,7 +240,7 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
         Cursor = crVSplit
         Left = 0
         Height = 5
-        Top = 394
+        Top = 428
         Width = 950
         Align = alBottom
         ResizeAnchor = akBottom
@@ -248,11 +248,11 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
     end
     object tsLog: TTabSheet
       Caption = 'Log'
-      ClientHeight = 783
+      ClientHeight = 817
       ClientWidth = 950
       object memLog: TMemo
         Left = 0
-        Height = 783
+        Height = 817
         Top = 0
         Width = 950
         Align = alClient
@@ -267,7 +267,7 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
   end
   object Splitter1: TSplitter[5]
     Left = 319
-    Height = 821
+    Height = 845
     Top = 26
     Width = 5
   end
