@@ -4,13 +4,15 @@ A bare-bones video player/viewer for inspection video recorded using OptionsDVR.
 
 This project is based on limited real-world exposure to OptionsDVR output, so some assumptions are involved. In particular, it assumes the following folder structure:
 
+```text
 <BaseFolder>\Data\<VesselCode>\<Options_Overlay_Hierarchy>\<VehicleName>\<video folders + files>
 <BaseFolder>\Anomaly\<VesselCode>\<Options_Overlay_Hierarchy>\<VehicleName>\<anomaly media>
 <BaseFolder>\Stills\<VesselCode>\<Options_Overlay_Hierarchy>\<VehicleName>\<video grabs>
+```
 
-<BaseFolder>, <VesselCode> and <VehicleName> are configurable before loading.
+`<BaseFolder>`, `<VesselCode>` and `<VehicleName>` are configurable before loading.
 
-Configure one <VehicleName> per ROV/AUV used on the job.
+Configure one `<VehicleName>` per ROV/AUV used on the job.
 
 ## Planned Features
 
