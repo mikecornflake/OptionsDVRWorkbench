@@ -438,7 +438,7 @@ Begin
     For j := 0 To oIniFile.ReadInteger(sIniSection, 'ExcludeCount', 0) - 1 Do
       oVehicle.Exclude.Add(oIniFile.ReadString(sIniSection, Format('Exclude%d', [j]), ''));
 
-    FVehicleFolders.Add(oVehicle);
+    {%H-}FVehicleFolders.Add(oVehicle);
   End;
 
   fmeVideoPlayer.Autoplay := FAutoplay;
