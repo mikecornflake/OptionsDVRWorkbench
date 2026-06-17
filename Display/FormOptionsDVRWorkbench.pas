@@ -30,6 +30,7 @@ Type
     btnAutoload: TToolButton;
     btnConfigureFolders: TToolButton;
     btnAutoplay: TToolButton;
+    btnToggle: TToolButton;
     ToolButton2: TToolButton;
     ToolButton5: TToolButton;
     btnPlayFileB: TToolButton;
@@ -47,6 +48,7 @@ Type
     Procedure btnOpenFolderClick(Sender: TObject);
     Procedure btnPlayFileClick(Sender: TObject);
     Procedure btnPlayInternalClick(Sender: TObject);
+    Procedure btnToggleClick(Sender: TObject);
     Procedure FormCreate(Sender: TObject);
     Procedure FormDestroy(Sender: TObject);
     Procedure lvFilesSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
@@ -62,6 +64,7 @@ Type
     fmeVideoPlayer: TFrameVideoPlayer;
     fmeSyncedVideo: TfmeSyncedVideo;
 
+    Procedure ArrangeVideo(ARow: Boolean; ALength: Integer = -1);
     Procedure RefreshListViewControlPanel(AForceDisable: Boolean = False);
   Protected
     // Stored in %appdata% - Recommended for persisting user UI preferences
@@ -189,7 +192,7 @@ Begin
   If Not FAutoload Then
     fmeSyncedVideo.ClearUnloadedVideoFrames
   Else If Assigned(lvFiles.Selected) Then
-    btnPlayInternalClick(Nil);
+    btnPlayInternalClick(nil);
 End;
 
 Procedure TfrmOptionsDVRWorkbench.btnConfigureFoldersClick(Sender: TObject);
@@ -211,7 +214,7 @@ End;
 Procedure TfrmOptionsDVRWorkbench.btnAutoplayClick(Sender: TObject);
 Begin
   FAutoPlay := Not FAutoPlay;
-  fmeVideoPlayer.Autoplay:=FAutoplay;
+  fmeVideoPlayer.Autoplay := FAutoplay;
 
   btnAutoplay.Down := FAutoPlay;
 End;
@@ -290,7 +293,10 @@ Begin
         If fmeSyncedVideo.VideoFileCount > 0 Then
         Begin
           // Get the layout correct for the number of loaded videos
-          fmeSyncedVideo.Layout(1, fmeSyncedVideo.VideoFileCount, vlsLeftToRightThenDown);
+          If btnToggle.ImageIndex = 8 Then
+            fmeSyncedVideo.Layout(1, fmeSyncedVideo.VideoFileCount, vlsLeftToRightThenDown)
+          Else
+            fmeSyncedVideo.Layout(fmeSyncedVideo.VideoFileCount, 1, vlsTopToBottomThenRight);
 
           // Play the video
           fmeSyncedVideo.Play;
@@ -302,6 +308,59 @@ Begin
       Busy := False;
     End;
   End;
+End;
+
+Procedure TfrmOptionsDVRWorkbench.btnToggleClick(Sender: TObject);
+Begin
+  BeginFormUpdate;
+  Try
+    If btnToggle.ImageIndex = 8 Then
+      btnToggle.ImageIndex := 9
+    Else
+      btnToggle.ImageIndex := 8;
+
+    ArrangeVideo(btnToggle.ImageIndex = 8);
+  Finally
+    EndFormUpdate;
+  End;
+End;
+
+Procedure TfrmOptionsDVRWorkbench.ArrangeVideo(ARow: Boolean; ALength: Integer = -1);
+Var
+  iTemp: Integer;
+Begin
+  If ARow Then
+  Begin
+    btnToggle.ImageIndex := 8;
+    If ALength = -1 Then
+      iTemp := pnlVideo.Width
+    Else
+      iTemp := ALength;
+    pnlVideo.Align := alBottom;
+    pnlVideo.Height := iTemp;
+
+    splVideo.Align := alBottom;
+    splVideo.Top := pnlVideo.Top - splVideo.Height;
+
+    fmeSyncedVideo.Layout(1, fmeSyncedVideo.VideoFileCount, vlsLeftToRightThenDown);
+  End
+  Else
+  Begin
+    btnToggle.ImageIndex := 9;
+    If ALength = -1 Then
+      iTemp := pnlVideo.Height
+    Else
+      iTemp := ALength;
+
+    pnlVideo.Align := alRight;
+    pnlVideo.Width := iTemp;;
+
+    splVideo.Align := alRight;
+    splVideo.Left := pnlVideo.Left - splVideo.Width;
+
+    fmeSyncedVideo.Layout(fmeSyncedVideo.VideoFileCount, 1, vlsTopToBottomThenRight);
+  End;
+
 End;
 
 Procedure TfrmOptionsDVRWorkbench.lvFilesSelectItem(Sender: TObject; Item: TListItem;
@@ -347,12 +406,18 @@ Var
   i, j: Integer;
   oVehicle: TVehicleFolder;
   sIniSection: String;
+  bRow: Boolean;
+  iLength: Longint;
 Begin
   // Stored in ini file with exe - what folders to load etc
   Inherited;
 
-  FAutoload := oInifile.ReadBool('General', 'Autoload', False);
-  FAutoPlay := oInifile.ReadBool('General', 'Autoplay', True);
+  bRow := oInifile.ReadBool('Video', 'Layout As Row', True);
+  iLength := oInifile.ReadInteger('Video', 'Length', pnlVideo.Height);
+  ArrangeVideo(bRow, iLength);
+
+  FAutoload := oInifile.ReadBool('Video', 'Autoload', False);
+  FAutoPlay := oInifile.ReadBool('Video', 'Autoplay', True);
 
   FVehicleFolders.Clear;
 
@@ -376,7 +441,7 @@ Begin
     FVehicleFolders.Add(oVehicle);
   End;
 
-  fmeVideoPlayer.Autoplay:=FAutoplay;
+  fmeVideoPlayer.Autoplay := FAutoplay;
 End;
 
 Procedure TfrmOptionsDVRWorkbench.SaveGlobalSettings(oInifile: TIniFile);
@@ -391,8 +456,20 @@ Begin
   For i := 0 To FVehicleFolders.Count - 1 Do
     oInifile.EraseSection(Format('Vehicle%d', [i]));
 
-  oInifile.WriteBool('General', 'Autoload', FAutoload);
-  oInifile.WriteBool('General', 'Autoplay', FAutoPlay);
+  If btnToggle.ImageIndex = 8 Then
+  Begin
+    oInifile.WriteBool('Video', 'Layout As Row', True);
+    oInifile.WriteInteger('Video', 'Length', pnlVideo.Height);
+  End
+  Else
+  Begin
+    oInifile.WriteBool('Video', 'Layout As Row', False);
+    oInifile.WriteInteger('Video', 'Length', pnlVideo.Width);
+  End;
+
+  oInifile.WriteBool('Video', 'Autoload', FAutoload);
+  oInifile.WriteBool('Video', 'Autoplay', FAutoPlay);
+
   oInifile.WriteInteger('General', 'VehicleCount', FVehicleFolders.Count);
 
   For i := 0 To FVehicleFolders.Count - 1 Do
@@ -428,8 +505,10 @@ Begin
   btnPlayFileB.Enabled := False;
   btnPlayFileC.Enabled := False;
   btnPlayFileD.Enabled := False;
+
   btnAutoLoad.Enabled := False;
   btnAutoplay.Enabled := False;
+  btnToggle.Enabled := False;
 
   If AForceDisable Then
     Exit;
@@ -437,10 +516,12 @@ Begin
   If (lvFiles.Items.Count = 0) Then
     Exit;
 
+  btnToggle.Enabled := True;
   btnAutoLoad.Enabled := True;
   btnAutoload.Down := FAutoload;
 
-  btnAutoplay.Enabled := True;
+  // TODO Fix dynamic changes
+  //btnAutoplay.Enabled := False;
   btnAutoplay.Down := FAutoPlay;
 
   oItem := lvFiles.Selected;
@@ -495,7 +576,7 @@ Begin
   btnPlayFileD.Enabled := FileExists(sFileD);
 
   If btnAutoload.Down Then
-    btnPlayInternalClick(Nil);
+    btnPlayInternalClick(nil);
 End;
 
 Procedure TfrmOptionsDVRWorkbench.LoadLocalSettings(oInifile: TIniFile);
