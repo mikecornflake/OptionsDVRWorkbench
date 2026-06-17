@@ -161,6 +161,7 @@ https://github.com/mikecornflake/UW_MPVPlayer
 
 Mike Thompson — CSWIP 3.4U Subsea Inspection Engineer and developer.
 
+- Inspector Mike 2.0 Pty Ltd
 - https://wiki.freepascal.org/User:Mike.cornflake
 - https://github.com/mikecornflake
 
