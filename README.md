@@ -65,8 +65,6 @@ You are free to use, distribute and modify this software, but please keep the ac
 
 ## Build information
 
-## Build Information
-
 This project is currently developed and tested using:
 
 - Lazarus Trunk (4.8)
