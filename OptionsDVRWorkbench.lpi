@@ -16,6 +16,7 @@
     </General>
     <VersionInfo>
       <UseVersionInfo Value="True"/>
+      <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="1"/>
       <StringTable Comments="Bones of an OptionsDVR video viewer" CompanyName="Inspector Mike 2.0 Pty Ltd" LegalCopyright="Copyright 2026" ProductName="OptionsDVRWorkbench"/>
     </VersionInfo>
