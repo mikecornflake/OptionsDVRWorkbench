@@ -71,6 +71,7 @@
       <Unit>
         <Filename Value="Display\DialogFolder.pas"/>
         <ComponentName Value="dlgVehicleFolder"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
     </Units>
@@ -89,6 +90,7 @@
     <Linking>
       <Debugging>
         <DebugInfoType Value="dsDwarf3"/>
+        <UseExternalDbgSyms Value="True"/>
       </Debugging>
       <Options>
         <Win32>
