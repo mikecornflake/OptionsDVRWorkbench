@@ -5,15 +5,16 @@ A bare-bones video player/viewer for inspection video recorded using OptionsDVR.
 ## Current Functionality
 
 - Configure video folder locations for each vessel and vehicle (ROV/AUV)
-- Scan and parse OptionsDVR folder structures
+  - Configurable vehicle definitions and folder exclusions
+  - Scan and parse OptionsDVR folder structures
 - Browse inspection video by folder hierarchy
 - Open associated Anomaly and Stills folders directly from the application
-- Launch video files in an external media player
-- Play up to four synchronised video channels simultaneously
-- Synchronous playback controls (Play, Pause, Seek)
-- Automatic layout of multiple video channels
-- Support for MPV-based video playback
-- Configurable vehicle definitions and folder exclusions
+- Support for MPV-based video playback within the application:
+  - Play up to four synchronised video channels simultaneously
+  - Synchronous playback controls (Play, Pause, Seek)
+  - Automatic layout of multiple video channels
+- Launch video files in an external media player (for frame/image capture - see Planned Features)
+
 
 ## Assumptions
 This project is based on limited real-world exposure to OptionsDVR output, so some assumptions are involved. In particular, it assumes the following folder structure:
