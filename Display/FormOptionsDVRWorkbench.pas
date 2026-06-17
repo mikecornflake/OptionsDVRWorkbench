@@ -120,6 +120,8 @@ Begin
 
   fmeVideoPlayer := TFrameVideoPlayer.Create(Self);
   fmeVideoPlayer.Parent := pnlVideo;
+  fmeVideoPlayer.ShowLabel := True;
+  fmeVideoPlayer.Autoplay := True;
   fmeVideoPlayer.Name := 'fmeVideoPlayer';
   fmeVideoPlayer.Align := alClient;
 
@@ -133,12 +135,10 @@ Begin
     If fmeVideoPlayer.PlaybackFrame Is TfmeSyncedVideo Then
     Begin
       fmeSyncedVideo := TfmeSyncedVideo(fmeVideoPlayer.PlaybackFrame);
+      fmeSyncedVideo.Autoplay := fmeVideoPlayer.Autoplay;
       fmeSyncedVideo.PlaybackClass := TfmeVideoLibmpv;
     End;
   End;
-
-  fmeVideoPlayer.Autoplay := True;
-  fmeVideoPlayer.ShowLabel := False;
 End;
 
 Procedure TfrmOptionsDVRWorkbench.FormDestroy(Sender: TObject);
@@ -185,7 +185,7 @@ Begin
   btnAutoload.Down := FAutoload;
 
   If Not FAutoload Then
-    fmeSyncedVideo.ClearVideos
+    fmeSyncedVideo.ClearUnloadedVideoFrames
   Else If Assigned(lvFiles.Selected) Then
     btnPlayInternal.Click;
 End;
@@ -249,10 +249,7 @@ Begin
 End;
 
 Procedure TfrmOptionsDVRWorkbench.btnPlayInternalClick(Sender: TObject);
-Var
-  iCount: Integer;
 Begin
-  // Another sill hack
   If Assigned(lvFiles.Selected) Then
   Begin
     Busy := True;
@@ -267,41 +264,26 @@ Begin
 
       If (btnPlayFileA.Enabled) And Assigned(fmeSyncedVideo) Then
       Begin
-        // TODO Replace this with TfmeVideoBase.VideoCount;
-        iCount := 0;
-
         fmeSyncedVideo.PlaybackClass := TfmeVideoLibmpv;
 
-        fmeSyncedVideo.ClearVideos;
+        fmeSyncedVideo.BeginLoadVideos;
+        Try
+          If FileExists(btnPlayFileA.Hint) Then fmeSyncedVideo.Load(btnPlayFileA.Hint);
+          If FileExists(btnPlayFileB.Hint) Then fmeSyncedVideo.Load(btnPlayFileB.Hint);
+          If FileExists(btnPlayFileC.Hint) Then fmeSyncedVideo.Load(btnPlayFileC.Hint);
+          If FileExists(btnPlayFileD.Hint) Then fmeSyncedVideo.Load(btnPlayFileD.Hint);
+        Finally
+          fmeSyncedVideo.EndLoadVideos;
+        end;
 
-        If FileExists(btnPlayFileA.Hint) Then
+        If fmeSyncedVideo.VideoFileCount > 0 Then
         Begin
-          fmeSyncedVideo.Load(btnPlayFileA.Hint);
-          iCount += 1;
-        End;
+          // Get the layout correct for the number of loaded videos
+          fmeSyncedVideo.Layout(1, fmeSyncedVideo.VideoFileCount, vlsLeftToRightThenDown);
 
-        If FileExists(btnPlayFileB.Hint) Then
-        Begin
-          fmeSyncedVideo.Load(btnPlayFileB.Hint);
-          iCount += 1;
-        End;
-
-        If FileExists(btnPlayFileC.Hint) Then
-        Begin
-          fmeSyncedVideo.Load(btnPlayFileC.Hint);
-          iCount += 1;
-        End;
-
-        If FileExists(btnPlayFileD.Hint) Then
-        Begin
-          fmeSyncedVideo.Load(btnPlayFileD.Hint);
-          iCount += 1;
-        End;
-
-        If iCount > 0 Then
-        Begin
-          fmeSyncedVideo.Layout(1, iCount, vlsLeftToRightThenDown);
+          // Play the video
           fmeSyncedVideo.Play;
+          fmeVideoPlayer.RefreshUI;
         End;
       End;
     Finally

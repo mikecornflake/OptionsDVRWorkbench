@@ -207,11 +207,11 @@ Procedure PopulateOptionsDVRTreeView(ATreeView: TTreeView; AOptionsProperties: T
 
 Var
   i: Integer;
-  Prop: TOptionsProperty;
-  RelativePath: String;
-  Parts: TStringList;
+  oPoperty: TOptionsProperty;
+  sRelativePath: String;
+  slParts: TStringList;
 Begin
-  Parts := TStringList.Create;
+  slParts := TStringList.Create;
   ATreeView.Items.BeginUpdate;
   SetBusy;
   Try
@@ -219,19 +219,19 @@ Begin
 
     For i := 0 To AOptionsProperties.Count - 1 Do
     Begin
-      Prop := AOptionsProperties[i];
+      oPoperty := AOptionsProperties[i];
 
-      If Not Assigned(Prop.VehicleFolder) Then
+      If Not Assigned(oPoperty.VehicleFolder) Then
         Continue;
 
-      RelativePath := StripDataLeafFolder(Prop.Folder);
-      RelativePath := RemoveScanRoot(RelativePath, Prop.VehicleFolder);
-      RelativePath := RemoveVehicleNameFolders(RelativePath, Prop.VehicleFolder);
+      sRelativePath := StripDataLeafFolder(oPoperty.Folder);
+      sRelativePath := RemoveScanRoot(sRelativePath, oPoperty.VehicleFolder);
+      sRelativePath := RemoveVehicleNameFolders(sRelativePath, oPoperty.VehicleFolder);
 
-      SplitPath(RelativePath, Parts);
+      SplitPath(sRelativePath, slParts);
 
-      If Parts.Count > 0 Then
-        AddPathToTree(Parts);
+      If slParts.Count > 0 Then
+        AddPathToTree(slParts);
     End;
 
   Finally
@@ -239,7 +239,10 @@ Begin
     ATreeView.Items.EndUpdate;
     ATreeView.AlphaSort;
     ATreeView.FullCollapse;
-    Parts.Free;
+
+    If ATreeView.Items.Count > 0 Then
+      ATreeView.Selected := ATreeView.Items[0];
+    slParts.Free;
   End;
 End;
 
