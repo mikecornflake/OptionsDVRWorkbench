@@ -139,15 +139,16 @@ The Free Pascal mpv wrapper is by URUWorks:
 
 https://github.com/URUWorks/UW_MPVPlayer
 
-I have made some local changes to that wrapper. My branch is here:
+I have made some local changes to that wrapper. My branch is here, and I really need to submit patches back to URUWorks:
 
 https://github.com/mikecornflake/UW_MPVPlayer
 
 ## Who am I?
 
 Mike Thompson — CSWIP 3.4U Subsea Inspection Engineer and developer.
-https://wiki.freepascal.org/User:Mike.cornflake
-https://github.com/mikecornflake
+
+- https://wiki.freepascal.org/User:Mike.cornflake
+- https://github.com/mikecornflake
 
 
 ## Why release this?
