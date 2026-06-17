@@ -27,9 +27,9 @@ Type
     btnOpenAnomalyFolder: TToolButton;
     btnOpenStillsFolder: TToolButton;
     btnPlayFileA: TToolButton;
-    btnPlayInternal: TToolButton;
     btnAutoload: TToolButton;
     btnConfigureFolders: TToolButton;
+    btnAutoplay: TToolButton;
     ToolButton2: TToolButton;
     ToolButton5: TToolButton;
     btnPlayFileB: TToolButton;
@@ -42,6 +42,7 @@ Type
     tvFolders: TTreeView;
     Procedure btnAutoloadClick(Sender: TObject);
     Procedure btnConfigureFoldersClick(Sender: TObject);
+    Procedure btnAutoplayClick(Sender: TObject);
     Procedure btnScanFoldersClick(Sender: TObject);
     Procedure btnOpenFolderClick(Sender: TObject);
     Procedure btnPlayFileClick(Sender: TObject);
@@ -56,6 +57,7 @@ Type
     FOptionsProperties: TOptionsProperties;
     FLastLogTick: QWord;
     FAutoload: Boolean;
+    FAutoPlay: Boolean;
 
     fmeVideoPlayer: TFrameVideoPlayer;
     fmeSyncedVideo: TfmeSyncedVideo;
@@ -108,6 +110,7 @@ Begin
   FOptionsProperties := TOptionsProperties.Create(True);
   FLastLogTick := 0;
   FAutoload := False;
+  FAutoPlay := True;
 
   // Override the need to use --configure
   FAlwaysSaveSettings := True;
@@ -121,7 +124,7 @@ Begin
   fmeVideoPlayer := TFrameVideoPlayer.Create(Self);
   fmeVideoPlayer.Parent := pnlVideo;
   fmeVideoPlayer.ShowLabel := True;
-  fmeVideoPlayer.Autoplay := True;
+  fmeVideoPlayer.Autoplay := FAutoPlay;
   fmeVideoPlayer.Name := 'fmeVideoPlayer';
   fmeVideoPlayer.Align := alClient;
 
@@ -135,7 +138,6 @@ Begin
     If fmeVideoPlayer.PlaybackFrame Is TfmeSyncedVideo Then
     Begin
       fmeSyncedVideo := TfmeSyncedVideo(fmeVideoPlayer.PlaybackFrame);
-      fmeSyncedVideo.Autoplay := fmeVideoPlayer.Autoplay;
       fmeSyncedVideo.PlaybackClass := TfmeVideoLibmpv;
     End;
   End;
@@ -187,7 +189,7 @@ Begin
   If Not FAutoload Then
     fmeSyncedVideo.ClearUnloadedVideoFrames
   Else If Assigned(lvFiles.Selected) Then
-    btnPlayInternal.Click;
+    btnPlayInternalClick(Nil);
 End;
 
 Procedure TfrmOptionsDVRWorkbench.btnConfigureFoldersClick(Sender: TObject);
@@ -204,6 +206,14 @@ Begin
   Finally
     FreeAndNil(dlgFolders);
   End;
+End;
+
+Procedure TfrmOptionsDVRWorkbench.btnAutoplayClick(Sender: TObject);
+Begin
+  FAutoPlay := Not FAutoPlay;
+  fmeVideoPlayer.Autoplay:=FAutoplay;
+
+  btnAutoplay.Down := FAutoPlay;
 End;
 
 Procedure TfrmOptionsDVRWorkbench.btnOpenFolderClick(Sender: TObject);
@@ -265,6 +275,7 @@ Begin
       If (btnPlayFileA.Enabled) And Assigned(fmeSyncedVideo) Then
       Begin
         fmeSyncedVideo.PlaybackClass := TfmeVideoLibmpv;
+        fmeVideoPlayer.Autoplay := FAutoPlay;
 
         fmeSyncedVideo.BeginLoadVideos;
         Try
@@ -274,7 +285,7 @@ Begin
           If FileExists(btnPlayFileD.Hint) Then fmeSyncedVideo.Load(btnPlayFileD.Hint);
         Finally
           fmeSyncedVideo.EndLoadVideos;
-        end;
+        End;
 
         If fmeSyncedVideo.VideoFileCount > 0 Then
         Begin
@@ -340,6 +351,9 @@ Begin
   // Stored in ini file with exe - what folders to load etc
   Inherited;
 
+  FAutoload := oInifile.ReadBool('General', 'Autoload', False);
+  FAutoPlay := oInifile.ReadBool('General', 'Autoplay', True);
+
   FVehicleFolders.Clear;
 
   For i := 0 To oIniFile.ReadInteger('General', 'VehicleCount', 0) - 1 Do
@@ -361,6 +375,8 @@ Begin
 
     FVehicleFolders.Add(oVehicle);
   End;
+
+  fmeVideoPlayer.Autoplay:=FAutoplay;
 End;
 
 Procedure TfrmOptionsDVRWorkbench.SaveGlobalSettings(oInifile: TIniFile);
@@ -375,6 +391,8 @@ Begin
   For i := 0 To FVehicleFolders.Count - 1 Do
     oInifile.EraseSection(Format('Vehicle%d', [i]));
 
+  oInifile.WriteBool('General', 'Autoload', FAutoload);
+  oInifile.WriteBool('General', 'Autoplay', FAutoPlay);
   oInifile.WriteInteger('General', 'VehicleCount', FVehicleFolders.Count);
 
   For i := 0 To FVehicleFolders.Count - 1 Do
@@ -410,13 +428,20 @@ Begin
   btnPlayFileB.Enabled := False;
   btnPlayFileC.Enabled := False;
   btnPlayFileD.Enabled := False;
-  btnPlayInternal.Enabled := False;
+  btnAutoLoad.Enabled := False;
+  btnAutoplay.Enabled := False;
 
   If AForceDisable Then
     Exit;
 
   If (lvFiles.Items.Count = 0) Then
     Exit;
+
+  btnAutoLoad.Enabled := True;
+  btnAutoload.Down := FAutoload;
+
+  btnAutoplay.Enabled := True;
+  btnAutoplay.Down := FAutoPlay;
 
   oItem := lvFiles.Selected;
 
@@ -459,7 +484,6 @@ Begin
 
   btnPlayFileA.Hint := sFileA;
   btnPlayFileA.Enabled := FileExists(sFileA);
-  btnPlayInternal.Enabled := btnPlayFileA.Enabled;
 
   btnPlayFileB.Hint := sFileB;
   btnPlayFileB.Enabled := FileExists(sFileB);
@@ -471,7 +495,7 @@ Begin
   btnPlayFileD.Enabled := FileExists(sFileD);
 
   If btnAutoload.Down Then
-    btnPlayInternal.Click;
+    btnPlayInternalClick(Nil);
 End;
 
 Procedure TfrmOptionsDVRWorkbench.LoadLocalSettings(oInifile: TIniFile);
