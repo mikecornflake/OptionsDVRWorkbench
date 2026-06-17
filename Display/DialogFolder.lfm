@@ -1,0 +1,241 @@
+object dlgVehicleFolder: TdlgVehicleFolder
+  Left = 327
+  Height = 542
+  Top = 378
+  Width = 572
+  BorderIcons = []
+  Caption = 'Configure Vehicle Folder'
+  ClientHeight = 542
+  ClientWidth = 572
+  Constraints.MinHeight = 400
+  Constraints.MinWidth = 495
+  Position = poMainFormCenter
+  LCLVersion = '4.99.0.0'
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
+  object pnlButtons: TPanel
+    Left = 0
+    Height = 34
+    Top = 508
+    Width = 572
+    Align = alBottom
+    ClientHeight = 34
+    ClientWidth = 572
+    TabOrder = 0
+    object btnOK: TButton
+      Left = 449
+      Height = 25
+      Top = 3
+      Width = 42
+      Anchors = [akTop, akRight]
+      AutoSize = True
+      Caption = 'OK'
+      ModalResult = 1
+      TabOrder = 0
+    end
+    object btnCancel: TButton
+      Left = 497
+      Height = 25
+      Top = 3
+      Width = 62
+      Anchors = [akTop, akRight]
+      AutoSize = True
+      Cancel = True
+      Caption = 'Cancel'
+      ModalResult = 2
+      TabOrder = 1
+    end
+  end
+  object memNotes: TMemo
+    Left = 0
+    Height = 136
+    Top = 0
+    Width = 572
+    Align = alTop
+    Lines.Strings = (
+      'The expected Folder Structure is:'
+      ''
+      '        <Base>\Data\<VesselCode>\<Options_Overlay_Hierarchy>\<VehicleName>\<video folders + files>'
+      '<Base>\Anomaly\<VesselCode>\<Options_Overlay_Hierarchy>\<VehicleName>\<anomaly media>'
+      '         <Base>\Stills\<VesselCode>\<Options_Overlay_Hierarchy>\<VehicleName>\<video grabs>'
+      ''
+      'This dialog is expecting the <base> to be selected'
+    )
+    ScrollBars = ssAutoBoth
+    TabOrder = 1
+    WordWrap = False
+  end
+  object lblVesselCode: TLabel
+    AnchorSideTop.Control = memNotes
+    AnchorSideTop.Side = asrBottom
+    Left = 24
+    Height = 15
+    Top = 151
+    Width = 68
+    BorderSpacing.Top = 15
+    Caption = 'Vessel Code:'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object edtVesselCode: TEdit
+    AnchorSideLeft.Control = lblVesselCode
+    AnchorSideLeft.Side = asrBottom
+    AnchorSideTop.Control = lblVesselCode
+    AnchorSideTop.Side = asrCenter
+    AnchorSideRight.Control = Owner
+    AnchorSideRight.Side = asrBottom
+    Left = 117
+    Height = 23
+    Top = 147
+    Width = 435
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Left = 25
+    BorderSpacing.Right = 20
+    TabOrder = 2
+  end
+  object lblVesselName: TLabel
+    AnchorSideLeft.Control = lblVesselCode
+    AnchorSideTop.Control = lblVesselCode
+    AnchorSideTop.Side = asrBottom
+    Left = 24
+    Height = 15
+    Top = 181
+    Width = 73
+    BorderSpacing.Top = 15
+    Caption = 'Vessel Name:'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object edtVesselName: TEdit
+    AnchorSideLeft.Control = edtVesselCode
+    AnchorSideTop.Control = lblVesselName
+    AnchorSideTop.Side = asrCenter
+    AnchorSideRight.Control = edtVesselCode
+    AnchorSideRight.Side = asrBottom
+    Left = 117
+    Height = 23
+    Top = 177
+    Width = 435
+    Anchors = [akTop, akLeft, akRight]
+    BorderSpacing.Top = 15
+    TabOrder = 3
+  end
+  object lblVehicleName: TLabel
+    AnchorSideLeft.Control = lblVesselName
+    AnchorSideTop.Control = lblVesselName
+    AnchorSideTop.Side = asrBottom
+    Left = 24
+    Height = 15
+    Top = 211
+    Width = 79
+    BorderSpacing.Top = 15
+    Caption = 'Vehicle Name:'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object edtVehicleName: TEdit
+    AnchorSideLeft.Control = edtVesselName
+    AnchorSideTop.Control = lblVehicleName
+    AnchorSideTop.Side = asrCenter
+    AnchorSideRight.Control = edtVesselName
+    AnchorSideRight.Side = asrBottom
+    Left = 117
+    Height = 23
+    Top = 207
+    Width = 435
+    Anchors = [akTop, akLeft, akRight]
+    TabOrder = 4
+  end
+  object lblVehicleClass: TLabel
+    AnchorSideLeft.Control = lblVesselCode
+    AnchorSideTop.Control = lblVehicleName
+    AnchorSideTop.Side = asrBottom
+    Left = 24
+    Height = 15
+    Top = 241
+    Width = 72
+    BorderSpacing.Top = 15
+    Caption = 'Vehicle Class:'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object cboVehicleClass: TComboBox
+    AnchorSideLeft.Control = edtVesselCode
+    AnchorSideTop.Control = lblVehicleClass
+    AnchorSideTop.Side = asrCenter
+    AnchorSideRight.Control = edtVesselCode
+    AnchorSideRight.Side = asrBottom
+    Left = 117
+    Height = 23
+    Top = 237
+    Width = 435
+    Anchors = [akTop, akLeft, akRight]
+    ItemHeight = 15
+    Items.Strings = (
+      'OBSROV'
+      'WCLASS'
+      'AUV'
+    )
+    TabOrder = 5
+  end
+  object lblFolder: TLabel
+    AnchorSideLeft.Control = lblVesselCode
+    AnchorSideTop.Control = lblVehicleClass
+    AnchorSideTop.Side = asrBottom
+    Left = 24
+    Height = 15
+    Hint = 'There are expected to be Data; Anomaly & Stills folders under this folder'
+    Top = 271
+    Width = 67
+    BorderSpacing.Top = 15
+    Caption = 'Base Folder:'
+    Font.Style = [fsBold]
+    ParentFont = False
+    ParentShowHint = False
+    ShowHint = True
+  end
+  object edtFolder: TDirectoryEdit
+    AnchorSideLeft.Control = edtVesselCode
+    AnchorSideTop.Control = lblFolder
+    AnchorSideTop.Side = asrCenter
+    AnchorSideRight.Control = edtVesselCode
+    AnchorSideRight.Side = asrBottom
+    Left = 117
+    Height = 23
+    Top = 267
+    Width = 435
+    ShowHidden = False
+    ButtonWidth = 23
+    NumGlyphs = 1
+    Anchors = [akTop, akLeft, akRight]
+    MaxLength = 0
+    TabOrder = 6
+  end
+  object lblExclude: TLabel
+    AnchorSideLeft.Control = lblVesselCode
+    AnchorSideTop.Control = lblFolder
+    AnchorSideTop.Side = asrBottom
+    Left = 24
+    Height = 15
+    Top = 301
+    Width = 89
+    BorderSpacing.Top = 15
+    Caption = 'Exclude Folders:'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
+  object memExclude: TMemo
+    AnchorSideLeft.Control = edtVesselCode
+    AnchorSideTop.Control = lblExclude
+    AnchorSideRight.Control = edtVesselCode
+    AnchorSideRight.Side = asrBottom
+    AnchorSideBottom.Control = pnlButtons
+    Left = 117
+    Height = 187
+    Top = 301
+    Width = 435
+    Anchors = [akTop, akLeft, akRight, akBottom]
+    BorderSpacing.Bottom = 20
+    TabOrder = 7
+  end
+end

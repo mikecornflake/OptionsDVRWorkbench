@@ -29,6 +29,7 @@ Type
     btnPlayFileA: TToolButton;
     btnPlayInternal: TToolButton;
     btnAutoload: TToolButton;
+    btnConfigureFolders: TToolButton;
     ToolButton2: TToolButton;
     ToolButton5: TToolButton;
     btnPlayFileB: TToolButton;
@@ -40,6 +41,7 @@ Type
     btnScanFolders: TToolButton;
     tvFolders: TTreeView;
     Procedure btnAutoloadClick(Sender: TObject);
+    Procedure btnConfigureFoldersClick(Sender: TObject);
     Procedure btnScanFoldersClick(Sender: TObject);
     Procedure btnOpenFolderClick(Sender: TObject);
     Procedure btnPlayFileClick(Sender: TObject);
@@ -106,6 +108,9 @@ Begin
   FOptionsProperties := TOptionsProperties.Create(True);
   FLastLogTick := 0;
   FAutoload := False;
+
+  // Override the need to use --configure
+  FAlwaysSaveSettings := True;
 
   pcMain.ActivePage := tsVideo;
 
@@ -183,6 +188,22 @@ Begin
     fmeSyncedVideo.ClearVideos
   Else If Assigned(lvFiles.Selected) Then
     btnPlayInternal.Click;
+End;
+
+Procedure TfrmOptionsDVRWorkbench.btnConfigureFoldersClick(Sender: TObject);
+Var
+  dlgFolders: TdlgVehicleFolders;
+Begin
+  dlgFolders := TdlgVehicleFolders.Create(Self);
+  Try
+    dlgFolders.SetVehicleFolders(FVehicleFolders);
+    If dlgFolders.ShowModal = mrOk Then
+    Begin
+      FVehicleFolders.Assign(dlgFolders.GetVehicleFolders);
+    End;
+  Finally
+    FreeAndNil(dlgFolders);
+  End;
 End;
 
 Procedure TfrmOptionsDVRWorkbench.btnOpenFolderClick(Sender: TObject);
@@ -370,7 +391,7 @@ Begin
   Inherited;
 
   For i := 0 To FVehicleFolders.Count - 1 Do
-    oInifile.EraseSection(Format('oVehicle%d', [i]));
+    oInifile.EraseSection(Format('Vehicle%d', [i]));
 
   oInifile.WriteInteger('General', 'VehicleCount', FVehicleFolders.Count);
 

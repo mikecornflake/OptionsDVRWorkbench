@@ -45,11 +45,18 @@ inherited frmOptionsDVRWorkbench: TfrmOptionsDVRWorkbench
     ShowCaptions = True
     TabOrder = 0
     object btnScanFolders: TToolButton
-      Left = 1
+      Left = 124
       Top = 2
       Caption = 'Scan Folders'
       ImageIndex = 5
       OnClick = btnScanFoldersClick
+    end
+    object btnConfigureFolders: TToolButton
+      Left = 1
+      Top = 2
+      Caption = 'Configure Folders'
+      ImageIndex = 5
+      OnClick = btnConfigureFoldersClick
     end
   end
   object tvFolders: TTreeView[3]

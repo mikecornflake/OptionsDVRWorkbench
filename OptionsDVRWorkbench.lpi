@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CONFIG>
   <ProjectOptions>
-    <Version Value="12"/>
+    <Version Value="13"/>
     <PathDelim Value="\"/>
     <General>
       <SessionStorage Value="InProjectDir"/>
@@ -43,37 +43,35 @@
     <Units>
       <Unit>
         <Filename Value="OptionsDVRWorkbench.lpr"/>
-        <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="Display\FormOptionsDVRWorkbench.pas"/>
-        <IsPartOfProject Value="True"/>
         <ComponentName Value="frmOptionsDVRWorkbench"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
         <Filename Value="Classes\OptionsProperties.pas"/>
-        <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="Classes\VehicleFolders.pas"/>
-        <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="Display\DialogFolders.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="dlgFolders"/>
+        <ComponentName Value="dlgVehicleFolders"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
         <Filename Value="Classes\OptionsScanner.pas"/>
-        <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="Support\OptionsDVRSupport.pas"/>
-        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="Display\DialogFolder.pas"/>
+        <ComponentName Value="dlgVehicleFolder"/>
+        <ResourceBaseClass Value="Form"/>
       </Unit>
     </Units>
   </ProjectOptions>

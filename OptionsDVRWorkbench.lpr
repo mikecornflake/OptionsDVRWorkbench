@@ -11,7 +11,7 @@ Uses
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms,
-  FormOptionsDVRWorkbench { you can add units after this };
+  FormOptionsDVRWorkbench, DialogFolder { you can add units after this };
 
   {$R *.res}
 

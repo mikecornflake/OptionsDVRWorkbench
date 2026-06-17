@@ -8,6 +8,7 @@ Uses
   Classes, SysUtils, fgl;
 
 Type
+  TVehicleFolders = Class;
 
   { TVehicleFolder }
 
@@ -24,10 +25,17 @@ Type
     Constructor Create;
     Destructor Destroy; Override;
 
-    Property Exclude: TStringList Read FExclude Write FExclude;
+    Procedure Assign(ASource: TVehicleFolder);
+
+    Property Exclude: TStringList Read FExclude;
   End;
 
-  TVehicleFolders = Class(Specialize TFPGObjectList<TVehicleFolder>);
+  { TVehicleFolders }
+
+  TVehicleFolders = Class(Specialize TFPGObjectList<TVehicleFolder>)
+  Public
+    Procedure Assign(ASource: TVehicleFolders);
+  End;
 
 Implementation
 
@@ -37,6 +45,9 @@ Constructor TVehicleFolder.Create;
 Begin
   FExclude := TStringList.Create;
   FExclude.CaseSensitive := False;
+  FExclude.Sorted := True;
+  FExclude.Duplicates := dupIgnore;
+  FExclude.Delimiter := ',';
 End;
 
 Destructor TVehicleFolder.Destroy;
@@ -44,6 +55,37 @@ Begin
   FreeAndNil(FExclude);
 
   Inherited Destroy;
+End;
+
+Procedure TVehicleFolder.Assign(ASource: TVehicleFolder);
+Begin
+  If ASource = Self Then
+    Exit;
+
+  Folder := ASource.Folder;
+  VesselCode := ASource.VesselCode;
+  VesselName := ASource.VesselName;
+  VehicleName := ASource.VehicleName;
+  VehicleClass := ASource.VehicleClass;
+
+  FExclude.Assign(ASource.Exclude);
+End;
+
+{ TVehicleFolders }
+
+Procedure TVehicleFolders.Assign(ASource: TVehicleFolders);
+Var
+  oSourceVehicle, oVehicle: TVehicleFolder;
+Begin
+  Clear;
+
+  For oSourceVehicle In ASource Do
+  Begin
+    oVehicle := TVehicleFolder.Create;
+    oVehicle.Assign(oSourceVehicle);
+
+    Add(oVehicle);
+  End;
 End;
 
 End.
