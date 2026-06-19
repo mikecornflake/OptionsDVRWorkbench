@@ -91,7 +91,9 @@ Uses
   DateUtils,
   DialogFolders, OptionsScanner, OptionsDVRSupport,
   OSSupport, FileSupport,
-  FrameVideoLibmpv, LibmpvSupport, VideoGridLayout;
+  VideoEngineFactory, LibmpvSupport, VideoGridLayout,
+    // Include all required video playback engines below this point
+  FrameVideoLibmpv;
 
 Procedure Log(Const ALog: String);
 Begin
@@ -132,7 +134,7 @@ Begin
   fmeVideoPlayer.Align := alClient;
 
   // Change this line to swap playback engines.
-  fmeVideoPlayer.PlaybackClass := TFrameSyncedVideo;
+  fmeVideoPlayer.VideoEngineClass := TVideoEngineFactory.DefaultClass;
 
   fmeSyncedVideo := nil;
 
@@ -141,7 +143,7 @@ Begin
     If fmeVideoPlayer.PlaybackFrame Is TFrameSyncedVideo Then
     Begin
       fmeSyncedVideo := TFrameSyncedVideo(fmeVideoPlayer.PlaybackFrame);
-      fmeSyncedVideo.PlaybackClass := TFrameVideoLibmpv;
+      fmeSyncedVideo.VideoEngineClass := TVideoEngineFactory.DefaultClass;
     End;
   End;
 End;
@@ -277,7 +279,7 @@ Begin
 
       If (btnPlayFileA.Enabled) And Assigned(fmeSyncedVideo) Then
       Begin
-        fmeSyncedVideo.PlaybackClass := TFrameVideoLibmpv;
+        fmeSyncedVideo.VideoEngineClass := TVideoEngineFactory.DefaultClass;
         fmeVideoPlayer.Autoplay := FAutoPlay;
 
         fmeSyncedVideo.BeginLoadVideos;
