@@ -8,7 +8,7 @@ Interface
 Uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ExtCtrls,
   StdCtrls, Buttons, LCLType, IniFiles,
-  FormMain, FrameVideoPlayers, FrameVideoBase, FrameSyncedVideo,
+  FormMain, FrameVideoPlayer, FrameVideoBase, FrameSyncedVideo,
   VehicleFolders, OptionsProperties;
 
 Type
@@ -62,7 +62,7 @@ Type
     FAutoPlay: Boolean;
 
     fmeVideoPlayer: TFrameVideoPlayer;
-    fmeSyncedVideo: TfmeSyncedVideo;
+    fmeSyncedVideo: TFrameSyncedVideo;
 
     Procedure ArrangeVideo(ARow: Boolean; ALength: Integer = -1);
     Procedure RefreshListViewControlPanel(AForceDisable: Boolean = False);
@@ -132,16 +132,16 @@ Begin
   fmeVideoPlayer.Align := alClient;
 
   // Change this line to swap playback engines.
-  fmeVideoPlayer.PlaybackClass := TfmeSyncedVideo;
+  fmeVideoPlayer.PlaybackClass := TFrameSyncedVideo;
 
   fmeSyncedVideo := nil;
 
   If assigned(fmeVideoPlayer.PlaybackFrame) Then
   Begin
-    If fmeVideoPlayer.PlaybackFrame Is TfmeSyncedVideo Then
+    If fmeVideoPlayer.PlaybackFrame Is TFrameSyncedVideo Then
     Begin
-      fmeSyncedVideo := TfmeSyncedVideo(fmeVideoPlayer.PlaybackFrame);
-      fmeSyncedVideo.PlaybackClass := TfmeVideoLibmpv;
+      fmeSyncedVideo := TFrameSyncedVideo(fmeVideoPlayer.PlaybackFrame);
+      fmeSyncedVideo.PlaybackClass := TFrameVideoLibmpv;
     End;
   End;
 End;
@@ -271,13 +271,13 @@ Begin
       If Not Assigned(fmeSyncedVideo) Then
         If assigned(fmeVideoPlayer.PlaybackFrame) Then
         Begin
-          If fmeVideoPlayer.PlaybackFrame Is TfmeSyncedVideo Then
-            fmeSyncedVideo := TfmeSyncedVideo(fmeVideoPlayer.PlaybackFrame);
+          If fmeVideoPlayer.PlaybackFrame Is TFrameSyncedVideo Then
+            fmeSyncedVideo := TFrameSyncedVideo(fmeVideoPlayer.PlaybackFrame);
         End;
 
       If (btnPlayFileA.Enabled) And Assigned(fmeSyncedVideo) Then
       Begin
-        fmeSyncedVideo.PlaybackClass := TfmeVideoLibmpv;
+        fmeSyncedVideo.PlaybackClass := TFrameVideoLibmpv;
         fmeVideoPlayer.Autoplay := FAutoPlay;
 
         fmeSyncedVideo.BeginLoadVideos;
