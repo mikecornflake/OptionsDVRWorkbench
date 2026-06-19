@@ -615,7 +615,4 @@ Begin
   Application.ProcessMessages;
 End;
 
-Initialization
-  InitializeLibmpv;
-
 End.
