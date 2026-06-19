@@ -15,7 +15,7 @@ Type
 
   { TfrmOptionsDVRWorkbench }
 
-  TfrmOptionsDVRWorkbench = Class(TfrmMain)
+  TfrmOptionsDVRWorkbench = Class(TFormMain)
     lvFiles: TListView;
     memLog: TMemo;
     pnlVideo: TPanel;
