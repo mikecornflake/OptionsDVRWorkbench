@@ -1,1 +1,5 @@
-OptionsDVRWorkbench.lps
+*.o
+*.ppu
+*.lps
+*.exe
+**/lib/
