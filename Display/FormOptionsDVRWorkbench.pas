@@ -91,8 +91,8 @@ Uses
   DateUtils,
   DialogFolders, OptionsScanner, OptionsDVRSupport,
   OSSupport, FileSupport,
-  VideoEngineFactory, LibmpvSupport, VideoGridLayout,
-    // Include all required video playback engines below this point
+  VideoEngineFactory, LibmpvSupport, ControlGridLayout,
+  // Include all required video playback engines below this point
   FrameVideoLibmpv;
 
 Procedure Log(Const ALog: String);
@@ -134,7 +134,7 @@ Begin
   fmeVideoPlayer.Align := alClient;
 
   // Change this line to swap playback engines.
-  fmeVideoPlayer.VideoEngineClass := TVideoEngineFactory.DefaultClass;
+  fmeVideoPlayer.VideoEngineClass := TFrameSyncedVideo;
 
   fmeSyncedVideo := nil;
 
@@ -296,9 +296,9 @@ Begin
         Begin
           // Get the layout correct for the number of loaded videos
           If btnToggle.ImageIndex = 8 Then
-            fmeSyncedVideo.Layout(1, fmeSyncedVideo.VideoFileCount, vlsLeftToRightThenDown)
+            fmeSyncedVideo.Layout(1, fmeSyncedVideo.VideoFileCount, clsLeftToRightThenDown)
           Else
-            fmeSyncedVideo.Layout(fmeSyncedVideo.VideoFileCount, 1, vlsTopToBottomThenRight);
+            fmeSyncedVideo.Layout(fmeSyncedVideo.VideoFileCount, 1, clsTopToBottomThenRight);
 
           // Play the video
           fmeSyncedVideo.Play;
@@ -344,7 +344,7 @@ Begin
     splVideo.Align := alBottom;
     splVideo.Top := pnlVideo.Top - splVideo.Height;
 
-    fmeSyncedVideo.Layout(1, fmeSyncedVideo.VideoFileCount, vlsLeftToRightThenDown);
+    fmeSyncedVideo.Layout(1, fmeSyncedVideo.VideoFileCount, clsLeftToRightThenDown);
   End
   Else
   Begin
@@ -360,7 +360,7 @@ Begin
     splVideo.Align := alRight;
     splVideo.Left := pnlVideo.Left - splVideo.Width;
 
-    fmeSyncedVideo.Layout(fmeSyncedVideo.VideoFileCount, 1, vlsTopToBottomThenRight);
+    fmeSyncedVideo.Layout(fmeSyncedVideo.VideoFileCount, 1, clsTopToBottomThenRight);
   End;
 
 End;
