@@ -18,7 +18,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="1"/>
-      <BuildNr Value="12"/>
+      <BuildNr Value="13"/>
       <StringTable Comments="Bones of an OptionsDVR video viewer" CompanyName="Inspector Mike 2.0 Pty Ltd" LegalCopyright="Copyright 2026" ProductName="OptionsDVRWorkbench"/>
     </VersionInfo>
     <BuildModes>
@@ -33,7 +33,7 @@
     </RunParams>
     <RequiredPackages>
       <Item>
-        <PackageName Value="IM_media.mpv"/>
+        <PackageName Value="IM_forms.media.mpv"/>
       </Item>
       <Item>
         <PackageName Value="IM_forms"/>
