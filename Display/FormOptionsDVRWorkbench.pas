@@ -274,13 +274,16 @@ Begin
         If assigned(fmeVideoPlayer.PlaybackFrame) Then
         Begin
           If fmeVideoPlayer.PlaybackFrame Is TFrameSyncedVideo Then
+          Begin
             fmeSyncedVideo := TFrameSyncedVideo(fmeVideoPlayer.PlaybackFrame);
+            fmeSyncedVideo.VideoEngineClass := TVideoEngineFactory.DefaultClass;
+          End;
         End;
 
       If (btnPlayFileA.Enabled) And Assigned(fmeSyncedVideo) Then
       Begin
-        fmeSyncedVideo.VideoEngineClass := TVideoEngineFactory.DefaultClass;
         fmeVideoPlayer.Autoplay := FAutoPlay;
+        fmeSyncedVideo.Rate := 1.0;
 
         fmeSyncedVideo.BeginLoadVideos;
         Try
