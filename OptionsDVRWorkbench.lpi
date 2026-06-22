@@ -18,7 +18,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="1"/>
-      <BuildNr Value="23"/>
+      <BuildNr Value="25"/>
       <StringTable Comments="Bones of an OptionsDVR video viewer" CompanyName="Inspector Mike 2.0 Pty Ltd" LegalCopyright="Copyright 2026" ProductName="OptionsDVRWorkbench"/>
     </VersionInfo>
     <BuildModes>
@@ -102,7 +102,7 @@
     </Linking>
     <Other>
       <CompilerMessages>
-        <IgnoredMessages idx6058="True" idx5024="True"/>
+        <IgnoredMessages idx6058="True" idx5024="True" idx3124="True" idx3123="True"/>
       </CompilerMessages>
     </Other>
   </CompilerOptions>

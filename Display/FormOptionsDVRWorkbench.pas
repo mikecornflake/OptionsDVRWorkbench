@@ -60,6 +60,7 @@ Type
     FLastLogTick: QWord;
     FAutoload: Boolean;
     FAutoPlay: Boolean;
+    FStartDateTime: TDateTime;
 
     fmeVideoPlayer: TFrameVideoPlayer;
     fmeSyncedVideo: TFrameSyncedVideo;
@@ -287,10 +288,17 @@ Begin
 
         fmeSyncedVideo.BeginLoadVideos;
         Try
-          If FileExists(btnPlayFileA.Hint) Then fmeSyncedVideo.Load(btnPlayFileA.Hint);
-          If FileExists(btnPlayFileB.Hint) Then fmeSyncedVideo.Load(btnPlayFileB.Hint);
-          If FileExists(btnPlayFileC.Hint) Then fmeSyncedVideo.Load(btnPlayFileC.Hint);
-          If FileExists(btnPlayFileD.Hint) Then fmeSyncedVideo.Load(btnPlayFileD.Hint);
+          If FileExists(btnPlayFileA.Hint) Then
+            fmeSyncedVideo.Load(btnPlayFileA.Hint, 'A', FStartDateTime);
+
+          If FileExists(btnPlayFileB.Hint) Then
+            fmeSyncedVideo.Load(btnPlayFileB.Hint, 'B', FStartDateTime);
+
+          If FileExists(btnPlayFileC.Hint) Then
+            fmeSyncedVideo.Load(btnPlayFileC.Hint, 'C', FStartDateTime);
+
+          If FileExists(btnPlayFileD.Hint) Then
+            fmeSyncedVideo.Load(btnPlayFileD.Hint, 'D', FStartDateTime);
         Finally
           fmeSyncedVideo.EndLoadVideos;
         End;
@@ -499,7 +507,7 @@ End;
 
 Procedure TfrmOptionsDVRWorkbench.RefreshListViewControlPanel(AForceDisable: Boolean);
 Var
-  sVideoFolder, sFileA, sAnomalyFolder, sStillsFolder, sFileB, sFileC, sFileD: String;
+  sVideoFolder, sFileA, sAnomalyFolder, sStillsFolder, sFileB, sFileC, sFileD, sDateTime: String;
   oItem: TListItem;
 Begin
   btnOpenVideoFolder.Enabled := False;
@@ -540,6 +548,7 @@ Begin
   If oItem.SubItems.Count < 4 Then
     Exit;
 
+  //  REALLY need to be storing this in a DB and retrieving.  Not this hack...
   sVideoFolder := oItem.SubItems[3];  // TODO Wrap column in Constant
 
   sAnomalyFolder := ExcludeTrailingPathDelimiter(sVideoFolder);
@@ -579,6 +588,9 @@ Begin
 
   btnPlayFileD.Hint := sFileD;
   btnPlayFileD.Enabled := FileExists(sFileD);
+
+  sDateTime := oItem.SubItems[1];
+  FStartDateTime := ScanDateTime('yyyy-mm-dd hh:nn:ss', sDateTime);
 
   If btnAutoload.Down Then
     btnPlayInternalClick(nil);
