@@ -13,8 +13,11 @@ A bare-bones video player/viewer for inspection video recorded using OptionsDVR.
   - Play up to four synchronised video channels simultaneously
   - Synchronous playback controls (Play, Pause, Seek)
   - Automatic layout of multiple video channels
-- Launch video files in an external media player (for frame/image capture - see Planned Features)
-
+  - Variable speed playback
+  - Mouse wheel seek (±3 seconds, ±1 seconds with ctrl, ±6 seconds with shift)
+  - Spacebar pause/resume
+  - Frame/image capture
+- Launch video files in an external media player (no longer required now player has all required functionality)
 
 ## Assumptions
 This project is based on limited real-world exposure to OptionsDVR output, so some assumptions are involved. In particular, it assumes the following folder structure:
@@ -33,10 +36,6 @@ Configure one `<VehicleName>` per ROV/AUV used on the job.
 
 ### Enhanced Video Playback
 
-- Fast forward and rewind controls
-- Mouse wheel seek (±3 seconds)
-- Spacebar pause/resume
-- Frame/image capture
 - Audio level meter
 - Audio spectrogram to quickly identify periods of commentary or activity
 - Improved playback timeline, potentially using an industrial-style three-tab trackbar
