@@ -281,13 +281,13 @@ Begin
           End;
         End;
 
-      If (btnPlayFileA.Enabled) And Assigned(fmeSyncedVideo) Then
-      Begin
-        fmeVideoPlayer.Autoplay := FAutoPlay;
-        fmeSyncedVideo.Rate := 1.0;
+      fmeSyncedVideo.BeginLoadVideos;
+      Try
+        If (btnPlayFileA.Enabled) And Assigned(fmeSyncedVideo) Then
+        Begin
+          fmeVideoPlayer.Autoplay := FAutoPlay;
+          fmeSyncedVideo.Rate := 1.0;
 
-        fmeSyncedVideo.BeginLoadVideos;
-        Try
           If FileExists(btnPlayFileA.Hint) Then
             fmeSyncedVideo.Load(btnPlayFileA.Hint, 'A', FStartDateTime);
 
@@ -299,22 +299,21 @@ Begin
 
           If FileExists(btnPlayFileD.Hint) Then
             fmeSyncedVideo.Load(btnPlayFileD.Hint, 'D', FStartDateTime);
-        Finally
-          fmeSyncedVideo.EndLoadVideos;
         End;
+      Finally
+        fmeSyncedVideo.EndLoadVideos;
+      End;
+      If fmeSyncedVideo.VideoFileCount > 0 Then
+      Begin
+        // Get the layout correct for the number of loaded videos
+        If btnToggle.ImageIndex = 8 Then
+          fmeSyncedVideo.Layout(1, fmeSyncedVideo.VideoFileCount, clsLeftToRightThenDown)
+        Else
+          fmeSyncedVideo.Layout(fmeSyncedVideo.VideoFileCount, 1, clsTopToBottomThenRight);
 
-        If fmeSyncedVideo.VideoFileCount > 0 Then
-        Begin
-          // Get the layout correct for the number of loaded videos
-          If btnToggle.ImageIndex = 8 Then
-            fmeSyncedVideo.Layout(1, fmeSyncedVideo.VideoFileCount, clsLeftToRightThenDown)
-          Else
-            fmeSyncedVideo.Layout(fmeSyncedVideo.VideoFileCount, 1, clsTopToBottomThenRight);
-
-          // Play the video
-          fmeSyncedVideo.Play;
-          fmeVideoPlayer.RefreshUI;
-        End;
+        // Play the video
+        fmeSyncedVideo.Play;
+        fmeVideoPlayer.RefreshUI;
       End;
     Finally
       EndFormUpdate;
