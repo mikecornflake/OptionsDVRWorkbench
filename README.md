@@ -1,8 +1,10 @@
 # OptionsDVRWorkbench
 
-A bare-bones video player/viewer for inspection video recorded using OptionsDVR.
+A lightweight workbench for reviewing inspection video recorded using OptionsDVR.
 
-## Current Functionality
+**Current status:** Early preview release. The application is already useful for reviewing OptionsDVR recordings, but the database, event import and anomaly management features are still under development.
+
+## Current Features
 
 - Configure video folder locations for each vessel and vehicle (ROV/AUV)
   - Configurable vehicle definitions and folder exclusions
@@ -10,14 +12,14 @@ A bare-bones video player/viewer for inspection video recorded using OptionsDVR.
 - Browse inspection video by folder hierarchy
 - Open associated Anomaly and Stills folders directly from the application
 - Support for MPV-based video playback within the application:
-  - Play up to four synchronised video channels simultaneously
+  - Play one to four synchronised video channels simultaneously
   - Synchronous playback controls (Play, Pause, Seek)
   - Automatic layout of multiple video channels
   - Variable speed playback
-  - Mouse wheel seek (±3 seconds, ±1 seconds with ctrl, ±6 seconds with shift)
+  - Mouse wheel seek (±3 seconds, ±1 seconds with Ctrl, ±6 seconds with Shift)
   - Spacebar pause/resume
   - Frame/image capture
-- Launch video files in an external media player (no longer required now player has all required functionality)
+- Optionally launch video files in an external media player.
 
 ## Assumptions
 This project is based on limited real-world exposure to OptionsDVR output, so some assumptions are involved. In particular, it assumes the following folder structure:
@@ -34,8 +36,21 @@ Configure one `<VehicleName>` per ROV/AUV used on the job.
 
 ## Planned Features
 
+### Database and Performance
+
+- Eliminate the need to rescan video folders on every startup
+- Store video metadata in SQLite for faster loading and searching
+- Support portable deployments on external drives by optionally storing relative paths instead of absolute paths
+- Provide automatic database rebuild and validation tools
+
+### Additional Inspection Formats
+
+- Support additional inspection video packages beyond OptionsDVR
+- Package-specific loaders built on a common inspection media framework
+
 ### Enhanced Video Playback
 
+- Volume control
 - Audio level meter
 - Audio spectrogram to quickly identify periods of commentary or activity
 - Improved playback timeline, potentially using an industrial-style three-tab trackbar
@@ -55,13 +70,6 @@ OptionsDVR stores vehicle position data alongside the video. Planned features in
 - Plotting vehicle movement on an Easting/Northing chart
 - Broadcasting a simulated GPS/NMEA position stream for external applications such as QGIS
 - Synchronising video playback with GIS mapping tools
-
-### Database and Performance
-
-- Eliminate the need to rescan video folders on every startup
-- Store video metadata in SQLite for faster loading and searching
-- Support portable deployments on external drives by optionally storing relative paths instead of absolute paths
-- Provide automatic database rebuild and validation tools
 
 ### Events and Inspection Logs
 
@@ -89,20 +97,17 @@ This project is currently developed and tested using:
 The following packages are required from InspectorMike Common:
 
 - IM_units.lpk
-- IM_application.lpk
+- IM_forms.lpk
+- IM_forms.media.lpk
+- IM_forms.media.mpv.lpk
 
 Repository:
 
 https://github.com/mikecornflake/InspectorMike-common
 
-These packages have the following additional dependencies, available through the Lazarus Online Package Manager (OPM):
+Install the following package from the Lazarus Online Package Manager (OPM):
 
-- cryptini.lpk
-- flvectorialpkg.lpk
-- LaSerialPort.lpk
-- SynEdit.lpk
 - TurboPowerIPro.lpk
-- zcomponent.lpk
 
 ### Video Playback
 
@@ -122,7 +127,7 @@ The DLL may be located in any of the following locations:
 
 - A directory included in the system `PATH`
 - The same directory as `OptionsDVRWorkbench.exe`
-- An `mpv` subdirectory beneath the application folder
+- An `mpv\x86_64` subdirectory beneath the application folder
 
 For example:
 
@@ -133,7 +138,7 @@ libmpv-2.dll
 or
 ```text
 OptionsDVRWorkbench.exe
-mpv\libmpv-2.dll
+mpv\x86_64\libmpv-2.dll
 ```
 
 ## Acknowledgements
@@ -153,13 +158,9 @@ The Free Pascal mpv wrapper is by URUWorks:
 
 https://github.com/URUWorks/UW_MPVPlayer
 
-I have made some local changes to that wrapper. My branch is here, and I really need to submit patches back to URUWorks:
-
-https://github.com/mikecornflake/UW_MPVPlayer
-
 ## Who am I?
 
-Mike Thompson — CSWIP 3.4U Subsea Inspection Engineer and developer.
+This project is developed by Mike Thompson, a CSWIP 3.4U Subsea Inspection Engineer and former professional Delphi developer who regularly works with offshore inspection video from multiple contractors.
 
 - Inspector Mike 2.0 Pty Ltd
 - https://wiki.freepascal.org/User:Mike.cornflake
@@ -168,7 +169,7 @@ Mike Thompson — CSWIP 3.4U Subsea Inspection Engineer and developer.
 
 ## Why release this?
 
-To fill a gap in OptionsDVR workflows.
+Commercial inspection DVR packages often provide limited facilities for end clients to review multiple synchronised video channels. This project aims to make inspection video easier to browse, review and analyse, while remaining portable and suitable for offshore use.
 
 ## Is this free?
 
