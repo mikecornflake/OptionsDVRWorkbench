@@ -17,8 +17,8 @@
     <VersionInfo>
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
-      <MinorVersionNr Value="1"/>
-      <BuildNr Value="33"/>
+      <MinorVersionNr Value="2"/>
+      <BuildNr Value="34"/>
       <StringTable Comments="Bones of an OptionsDVR video viewer" CompanyName="Inspector Mike 2.0 Pty Ltd" LegalCopyright="Copyright 2026" ProductName="OptionsDVRWorkbench"/>
     </VersionInfo>
     <BuildModes>
