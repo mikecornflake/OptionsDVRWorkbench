@@ -28,7 +28,7 @@ Type
     Procedure OpenDatabase(Const AFilename: String);
     Procedure CloseDatabase;
 
-    Procedure CreateDatabase(Const AFilename: String; Const ACreateSQL: String);
+    Procedure CreateDatabase(Const AFilename: String; Const ASchemaPath: String);
     Procedure ExecuteSQLScript(Const ASQL: String);
 
     Function IsOpen: Boolean;
@@ -41,14 +41,26 @@ Type
 
 Implementation
 
-{ TOISDatabase }
+Uses SQLite3Dyn, FileSupport;
+
+  { TOISDatabase }
 
 Constructor TOISDatabase.Create;
+Var
+  sDriver: String;
 Begin
   Inherited Create;
 
-  FConnection := TSQLite3Connection.Create(Nil);
-  FTransaction := TSQLTransaction.Create(Nil);
+  If SQLiteLoadedLibrary = '' Then
+  Begin
+    sDriver := FindDriverFileInFolders('sqlite', 'sqlite3.dll');
+
+    // This should raise exceptions if dll not found
+    InitializeSQLite(sDriver);
+  End;
+
+  FConnection := TSQLite3Connection.Create(nil);
+  FTransaction := TSQLTransaction.Create(nil);
 
   FConnection.Transaction := FTransaction;
   FTransaction.Database := FConnection;
@@ -105,7 +117,9 @@ Begin
     Raise EOISDatabase.Create('Database is not open');
 End;
 
-Procedure TOISDatabase.CreateDatabase(Const AFilename: String; Const ACreateSQL: String);
+Procedure TOISDatabase.CreateDatabase(Const AFilename: String; Const ASchemaPath: String);
+Var
+  sSchemaFile, sSchemaSQL: String;
 Begin
   If Trim(AFilename) = '' Then
     Raise EOISDatabase.Create('Database filename is blank');
@@ -114,7 +128,18 @@ Begin
     Raise EOISDatabase.CreateFmt('Database already exists: %s', [AFilename]);
 
   OpenDatabase(AFilename);
-  ExecuteSQLScript(ACreateSQL);
+
+  If Not FileExists(sSchemaFile) Then
+    Raise EOISDatabase.CreateFmt('Schema file not found: %s', [sSchemaFile]);
+
+  sSchemaSQL := LoadTextFile(sSchemaFile);
+
+  If Trim(sSchemaSQL) = '' Then
+    Raise EOISDatabase.CreateFmt('Schema file is empty: %s', [sSchemaFile]);
+
+  ExecuteSQLScript('PRAGMA foreign_keys = OFF;');
+  ExecuteSQLScript(sSchemaSQL);
+  ExecuteSQLScript('PRAGMA foreign_keys = ON;');
 End;
 
 Function TOISDatabase.SchemaVersion: Integer;
@@ -123,7 +148,7 @@ Var
 Begin
   CheckOpen;
 
-  Query := TSQLQuery.Create(Nil);
+  Query := TSQLQuery.Create(nil);
   Try
     Query.Database := FConnection;
     Query.Transaction := FTransaction;
@@ -137,23 +162,13 @@ Begin
 End;
 
 Procedure TOISDatabase.ExecuteStatement(Const ASQL: String);
-Var
-  Query: TSQLQuery;
 Begin
   CheckOpen;
 
   If Trim(ASQL) = '' Then
     Exit;
 
-  Query := TSQLQuery.Create(Nil);
-  Try
-    Query.Database := FConnection;
-    Query.Transaction := FTransaction;
-    Query.SQL.Text := ASQL;
-    Query.ExecSQL;
-  Finally
-    Query.Free;
-  End;
+  FConnection.ExecuteDirect(ASQL);
 End;
 
 Procedure TOISDatabase.ExecuteSQLScript(Const ASQL: String);
@@ -170,7 +185,8 @@ Begin
     Script.Text := ASQL;
     Statement := '';
 
-    FTransaction.StartTransaction;
+    If Not FTransaction.Active Then
+      FTransaction.StartTransaction;
     Try
       For i := 0 To Script.Count - 1 Do
       Begin
