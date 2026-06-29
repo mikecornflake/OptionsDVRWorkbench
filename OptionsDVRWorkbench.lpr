@@ -10,8 +10,8 @@ Uses
   athreads,
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms,
-  FormOptionsDVRWorkbench { you can add units after this };
+  Forms, FormOptionsDVRWorkbench, OIS.Database, OIS.Model, OIS.Support,
+  OIS.Repository, OIS.Workflow, OIS.Context { you can add units after this };
 
   {$R *.res}
 

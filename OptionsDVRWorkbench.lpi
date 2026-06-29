@@ -18,7 +18,7 @@
       <UseVersionInfo Value="True"/>
       <AutoIncrementBuild Value="True"/>
       <MinorVersionNr Value="2"/>
-      <BuildNr Value="34"/>
+      <BuildNr Value="36"/>
       <StringTable Comments="Bones of an OptionsDVR video viewer" CompanyName="Inspector Mike 2.0 Pty Ltd" LegalCopyright="Copyright 2026" ProductName="OptionsDVRWorkbench"/>
     </VersionInfo>
     <BuildModes>
@@ -76,6 +76,24 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
+      <Unit>
+        <Filename Value="Database\OIS.Database.pas"/>
+      </Unit>
+      <Unit>
+        <Filename Value="Database\OIS.Model.pas"/>
+      </Unit>
+      <Unit>
+        <Filename Value="Database\OIS.Support.pas"/>
+      </Unit>
+      <Unit>
+        <Filename Value="Database\OIS.Repository.pas"/>
+      </Unit>
+      <Unit>
+        <Filename Value="Database\OIS.Workflow.pas"/>
+      </Unit>
+      <Unit>
+        <Filename Value="Database\OIS.Context.pas"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>
@@ -86,7 +104,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="Display;Classes;Support"/>
+      <OtherUnitFiles Value="Display;Classes;Support;Database"/>
       <UnitOutputDirectory Value="$(TestDir)\lib\$(TargetCPU)-$(TargetOS)\$NameOnly($(ProjFile))"/>
     </SearchPaths>
     <Linking>

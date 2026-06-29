@@ -9,7 +9,7 @@ Uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ExtCtrls,
   StdCtrls, Buttons, LCLType, IniFiles,
   FormMain, FrameVideoPlayer, FrameVideoBase, FrameSyncedVideo,
-  VehicleFolders, OptionsProperties;
+  VehicleFolders, OptionsProperties, OIS.Database, OIS.Repository, OIS.Context;
 
 Type
 
@@ -31,7 +31,9 @@ Type
     btnConfigureFolders: TToolButton;
     btnAutoplay: TToolButton;
     btnToggle: TToolButton;
+    btnOpenDatabase: TToolButton;
     ToolButton2: TToolButton;
+    btnSep1: TToolButton;
     ToolButton5: TToolButton;
     btnPlayFileB: TToolButton;
     btnPlayFileC: TToolButton;
@@ -44,6 +46,7 @@ Type
     Procedure btnAutoloadClick(Sender: TObject);
     Procedure btnConfigureFoldersClick(Sender: TObject);
     Procedure btnAutoplayClick(Sender: TObject);
+    Procedure btnOpenDatabaseClick(Sender: TObject);
     Procedure btnScanFoldersClick(Sender: TObject);
     Procedure btnOpenFolderClick(Sender: TObject);
     Procedure btnPlayFileClick(Sender: TObject);
@@ -62,12 +65,18 @@ Type
     FAutoPlay: Boolean;
     FStartDateTime: TDateTime;
 
+    FDatabase: TOISDatabase;
+    FRepository: TOISRepository;
+    FContext: TOISContext;
+
     fmeVideoPlayer: TFrameVideoPlayer;
     fmeSyncedVideo: TFrameSyncedVideo;
 
     Procedure ArrangeVideo(ARow: Boolean; ALength: Integer = -1);
     Procedure RefreshListViewControlPanel(AForceDisable: Boolean = False);
   Protected
+    Procedure RefreshUI; Override;
+
     // Stored in %appdata% - Recommended for persisting user UI preferences
     Procedure LoadLocalSettings(oInifile: TIniFile); Override;
     Procedure SaveLocalSettings(oInifile: TIniFile); Override;
@@ -147,10 +156,20 @@ Begin
       fmeSyncedVideo.VideoEngineClass := TVideoEngineFactory.DefaultClass;
     End;
   End;
+
+  FDatabase := TOISDatabase.Create;
+  FRepository := TOISRepository.Create(FDatabase);
+  FContext := TOISContext.Create(FRepository);
+
+  RefreshUI;
 End;
 
 Procedure TfrmOptionsDVRWorkbench.FormDestroy(Sender: TObject);
 Begin
+  FreeAndNil(FContext);
+  FreeAndNil(FRepository);
+  FreeAndNil(FDatabase);
+
   FreeAndNil(fmeVideoPlayer);
   FreeAndNil(FOptionsProperties);
   FreeAndNil(FVehicleFolders);
@@ -220,6 +239,47 @@ Begin
   fmeVideoPlayer.Autoplay := FAutoplay;
 
   btnAutoplay.Down := FAutoPlay;
+End;
+
+Procedure TfrmOptionsDVRWorkbench.btnOpenDatabaseClick(Sender: TObject);
+Var
+  sDatabase, sSchemaPath: String;
+Begin
+  If Not FDatabase.IsOpen Then
+  Begin
+    sDatabase := ChangeFileExt(Application.ExeName, '.sqlite');
+    sSchemaPath := IncludeTrailingBackslash(Application.Location) + 'Schema';
+    If Not DirectoryExists(sSchemaPath) Then
+      sSchemaPath := '';
+
+    If FileExists(sDatabase) Then
+    Begin
+      FDatabase.OpenDatabase(sDatabase);
+
+      If (FDatabase.SchemaVersion <> 10) Then
+        Raise Exception.Create('Schema is not valid');
+    End
+    Else
+    Begin
+      If (sSchemaPath <> '') Then
+        FDatabase.CreateDatabase(sDatabase, sSchemaPath);
+    End;
+  End;
+
+  RefreshUI;
+End;
+
+Procedure TfrmOptionsDVRWorkbench.RefreshUI;
+Var
+  bDatabaseOpen: Boolean;
+Begin
+  Inherited RefreshUI;
+
+  bDatabaseOpen := FDatabase.IsOpen;
+
+  btnOpenDatabase.Enabled := Not bDatabaseOpen;
+  btnConfigureFolders.Enabled := bDatabaseOpen;
+  btnScanFolders.Enabled := bDatabaseOpen;
 End;
 
 Procedure TfrmOptionsDVRWorkbench.btnOpenFolderClick(Sender: TObject);
@@ -454,6 +514,8 @@ Begin
   End;
 
   fmeVideoPlayer.Autoplay := FAutoplay;
+
+  FContext.LoadSettings(oInifile, 'OIS');
 End;
 
 Procedure TfrmOptionsDVRWorkbench.SaveGlobalSettings(oInifile: TIniFile);
@@ -502,6 +564,8 @@ Begin
     For j := 0 To oVehicle.Exclude.Count - 1 Do
       oInifile.WriteString(sIniSection, Format('Exclude%d', [j]), oVehicle.Exclude[j]);
   End;
+
+  FContext.SaveSettings(oInifile, 'OIS');
 End;
 
 Procedure TfrmOptionsDVRWorkbench.RefreshListViewControlPanel(AForceDisable: Boolean);
